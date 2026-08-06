@@ -6,12 +6,12 @@
 @use "setting/var";
 
 
-// section // components
+// components
 @use "components/components";
 @use "components/admin-components";
 
 // pages
-@use "pages/home";
+@use "pages/mainhome";
 @use "pages/login";
 @use "pages/signup";
 @use "pages/product-list";

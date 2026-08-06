@@ -1,7 +1,5 @@
-import "./assets/sass/style.scss";
 import { RouterProvider } from "./router";
 import { useRouter } from "./router-hooks";
-import Home from "./pages/Home";
 import Login from "./pages/Login";
 import MyPage from "./pages/MyPage";
 import Orders from "./pages/Orders";
@@ -25,6 +23,8 @@ import AdminUsers from "./pages/AdminUsers";
 import AdminReviews from "./pages/AdminReviews";
 import AdminCategories from "./pages/AdminCategories";
 import AdminMyPage from "./pages/AdminMyPage";
+import MainHome from "./pages/MainHome";
+import "./assets/sass/style.scss";
 
 function App() {
   return <RouterProvider><AppRoutes /></RouterProvider>;
@@ -45,7 +45,7 @@ const AppRoutes = () => {
     return <Login redirectTo={pathname} />;
   }
 
-  if (pathname === "/") return <Home />;
+  if (pathname === "/") return <MainHome />;
   if (pathname === "/login") return <Login />;
   if (pathname === "/signup") return <Signup />;
   if (pathname === "/mypage") return <MyPage />;
