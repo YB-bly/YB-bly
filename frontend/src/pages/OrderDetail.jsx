@@ -2,10 +2,11 @@ import AppHeader from "../components/AppHeader";
 import { orders } from "../data/orders";
 import { formatPrice } from "../data/products";
 import { useOrderParams } from "../router-hooks";
+import { getMockOrders } from "../data/shopStorage";
 
 const OrderDetail = () => {
   const { orderId } = useOrderParams();
-  const order = orders.find((item) => item.id === Number(orderId));
+  const order = [...getMockOrders(), ...orders].find((item) => item.id === Number(orderId));
 
   if (!order) {
     return (
@@ -28,7 +29,7 @@ const OrderDetail = () => {
           </section>
           <section className="order-detail__section">
             <h2>주문 상품</h2>
-            <div className="order-detail__product"><img src={order.product.image} alt={order.product.name} /><div><strong>{order.product.brand}</strong><p>{order.product.name}</p><span>{order.option} · 1개</span><b>{formatPrice(order.product.price)}</b></div></div>
+            <div className="order-detail__product"><img src={order.product.image} alt={order.product.name} /><div><strong>{order.product.brand}</strong><p>{order.product.name}</p><span>{order.option} · {order.quantity ?? 1}개</span><b>{formatPrice(order.total ?? order.product.price)}</b></div></div>
           </section>
           <section className="order-detail__section">
             <h2>배송지 정보</h2>
@@ -36,7 +37,7 @@ const OrderDetail = () => {
           </section>
           <section className="order-detail__section">
             <h2>결제 정보</h2>
-            <dl><dt>상품 금액</dt><dd>{formatPrice(order.product.price)}</dd><dt>배송비</dt><dd>0원</dd><dt>총 결제 금액</dt><dd><strong>{formatPrice(order.product.price)}</strong></dd></dl>
+            <dl><dt>상품 금액</dt><dd>{formatPrice(order.subtotal ?? order.product.price)}</dd><dt>할인</dt><dd>-{formatPrice(order.discount ?? 0)}</dd><dt>배송비</dt><dd>0원</dd><dt>총 결제 금액</dt><dd><strong>{formatPrice(order.total ?? order.product.price)}</strong></dd></dl>
           </section>
           <p className="order-detail__number">주문번호 {order.number} · 내부 ID #{order.id}</p>
         </main>

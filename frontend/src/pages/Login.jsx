@@ -5,7 +5,7 @@ import AppHeader from "../components/AppHeader";
 import FormField from "../components/FormField";
 import BottomNavigation from "../components/BottomNavigation";
 
-const Login = ({ redirectTo }) => {
+const Login = ({ redirectTo, adminMode = false }) => {
   const navigate = useNavigate();
   const [error, setError] = useState("");
 
@@ -13,12 +13,20 @@ const Login = ({ redirectTo }) => {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
 
-    if (!form.get("email") || !form.get("password")) {
+    const email = form.get("email")?.trim();
+    const password = form.get("password");
+    if (!email || !password) {
       setError("이메일과 비밀번호를 모두 입력해 주세요.");
       return;
     }
 
+    if (adminMode && (email !== "admin@yb-bly.com" || password !== "admin1234")) {
+      setError("관리자 테스트 계정으로 로그인해 주세요.");
+      return;
+    }
+
     localStorage.setItem("yb-bly-auth", "true");
+    localStorage.setItem("yb-bly-role", email === "admin@yb-bly.com" && password === "admin1234" ? "admin" : "user");
     navigate(redirectTo || "/mypage", { replace: true });
   };
 
@@ -28,12 +36,12 @@ const Login = ({ redirectTo }) => {
         <AppHeader title="로그인" back actions={false} />
         <main className="login">
           {redirectTo && (
-            <p className="login__notice">찜과 마이페이지는 로그인 후 이용할 수 있어요.</p>
+            <p className="login__notice">{adminMode ? "관리자 페이지는 관리자 로그인 후 이용할 수 있어요." : "구매 활동과 마이페이지는 로그인 후 이용할 수 있어요."}</p>
           )}
           <header className="auth-header">
             <span className="auth-header__eyebrow">WELCOME BACK</span>
-            <h1 className="auth-header__title">다시 만나서 반가워요!</h1>
-            <p className="auth-header__description">YB-bly에서 오늘의 취향을 발견해 보세요.</p>
+            <h1 className="auth-header__title">{adminMode ? "관리자 로그인" : "다시 만나서 반가워요!"}</h1>
+            <p className="auth-header__description">{adminMode ? "상품과 주문 현황을 안전하게 관리하세요." : "YB-bly에서 오늘의 취향을 발견해 보세요."}</p>
           </header>
 
           <form className="auth-form" onSubmit={handleSubmit} noValidate>

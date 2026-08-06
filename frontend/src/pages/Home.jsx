@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "../router";
 import BottomNavigation from "../components/BottomNavigation";
+import AppHeader from "../components/AppHeader";
 import mainBannerImage from "../assets/images/home/main-banner.jpg";
 import categoryDirectDeliveryImage from "../assets/images/home/category-direct-delivery.jpg";
 import categoryBeautyImage from "../assets/images/home/category-beauty.jpg";
@@ -74,29 +75,10 @@ const products = [
 
 const Home = () => {
   return (
-    <div className="container">
-      <div className="home">
-        <header className="home-header">
-          <h1 className="home-logo">YB-bly</h1>
-
-          <div className="home-header-actions">
-            <Link
-              to="/search"
-              className="home-header-button"
-              aria-label="상품 검색"
-            >
-              ⌕
-            </Link>
-
-            <button
-              type="button"
-              className="home-header-button"
-              aria-label="장바구니"
-            >
-              ♧
-            </button>
-          </div>
-        </header>
+    <div className="home-page">
+      <div className="container">
+        <div className="home">
+        <AppHeader />
 
         <main className="home-main">
           <section className="home-banner">
@@ -166,7 +148,8 @@ const Home = () => {
           </section>
         </main>
 
-        <BottomNavigation />
+          <BottomNavigation />
+        </div>
       </div>
     </div>
   );

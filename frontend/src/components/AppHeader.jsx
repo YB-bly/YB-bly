@@ -31,9 +31,9 @@ const AppHeader = ({ title, back = false, actions = true }) => {
             <Link className="app-header__icon" to="/search" aria-label="검색">
               ⌕
             </Link>
-            <button type="button" className="app-header__icon" aria-label="장바구니">
+            <Link to="/cart" className="app-header__icon" aria-label="장바구니">
               ♧
-            </button>
+            </Link>
           </>
         )}
       </div>

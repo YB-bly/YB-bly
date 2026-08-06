@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "../router";
 import AppHeader from "../components/AppHeader";
 import BottomNavigation from "../components/BottomNavigation";
 
 const categoryGroups = {
   패션: {
-    상의: ["매일 직진배송", "긴소매 티셔츠", "반소매 티셔츠", "셔츠", "블라우스", "니트/스웨터", "맨투맨", "후드", "슬리브리스"],
-    아우터: ["매일 직진배송", "카디건", "재킷", "점퍼", "레더재킷", "트렌치코트", "트위드재킷", "사파리재킷", "베스트", "숏코트", "하프코트", "롱코트", "숏패딩", "롱패딩", "경량 패딩", "퍼코트"],
+    상의: ["긴소매 티셔츠", "반소매 티셔츠", "셔츠", "블라우스", "니트/스웨터", "맨투맨", "후드", "슬리브리스"],
+    아우터: ["카디건", "재킷", "점퍼", "레더재킷", "트렌치코트", "트위드재킷", "사파리재킷", "베스트", "숏코트", "하프코트", "롱코트", "숏패딩", "롱패딩", "경량 패딩", "퍼코트"],
     "팬츠/스커트": ["데님", "슬랙스", "코튼팬츠", "숏팬츠", "미니스커트", "롱스커트"],
     "원피스/세트": ["미니 원피스", "롱 원피스", "점프수트", "투피스 세트"],
     "이너웨어/잠옷": ["브라", "팬티", "홈웨어", "파자마"],
@@ -33,11 +33,19 @@ const categoryGroups = {
 const Categories = () => {
   const [tab, setTab] = useState("패션");
   const [section, setSection] = useState(Object.keys(categoryGroups.패션)[0]);
+  const groupRefs = useRef({});
+  const contentRef = useRef(null);
   const groups = categoryGroups[tab];
 
   const changeTab = (nextTab) => {
     setTab(nextTab);
     setSection(Object.keys(categoryGroups[nextTab])[0]);
+    requestAnimationFrame(() => contentRef.current?.scrollTo({ top: 0, behavior: "smooth" }));
+  };
+
+  const moveToSection = (item) => {
+    setSection(item);
+    groupRefs.current[item]?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   return (
@@ -54,18 +62,18 @@ const Categories = () => {
           <div className="categories__body">
             <aside className="categories__sidebar" aria-label={`${tab} 세부 카테고리`}>
               {Object.keys(groups).map((item) => (
-                <button key={item} className={section === item ? "is-active" : ""} onClick={() => setSection(item)}>{item}</button>
+                <button key={item} className={section === item ? "is-active" : ""} onClick={() => moveToSection(item)}>{item}</button>
               ))}
             </aside>
-            <section className="categories__content">
+            <section className="categories__content scroll-hidden" ref={contentRef}>
               {Object.entries(groups).map(([title, items]) => (
-                <div className="categories__group" key={title} id={`category-${title}`}>
-                  <div className="categories__group-title">
+                <div className="categories__group" key={title} ref={(node) => { groupRefs.current[title] = node; }}>
+                  <Link className="categories__group-title" to={`/products?category=${encodeURIComponent(title)}`}>
                     <span className="categories__thumbnail" aria-hidden="true">{title.slice(0, 1)}</span>
                     <h2>{title}</h2><span>›</span>
-                  </div>
+                  </Link>
                   <div className="categories__links">
-                    {items.map((item, index) => <Link className={index === 0 ? "is-highlighted" : ""} to={`/products?category=${encodeURIComponent(title)}`} key={item}>{item}</Link>)}
+                    {items.map((item) => <Link to={`/products?category=${encodeURIComponent(title)}&subcategory=${encodeURIComponent(item)}`} key={item}>{item}</Link>)}
                   </div>
                 </div>
               ))}

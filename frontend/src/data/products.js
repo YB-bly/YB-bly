@@ -16,6 +16,8 @@ export const products = [
     rating: 4.8,
     reviews: 328,
     badge: "BEST",
+    category: "상의",
+    subcategory: "반소매 티셔츠",
     image: flowerTshirtImage,
   },
   {
@@ -28,6 +30,8 @@ export const products = [
     rating: 4.7,
     reviews: 141,
     badge: "무료배송",
+    category: "상의",
+    subcategory: "셔츠",
     image: linenShirtImage,
   },
   {
@@ -40,6 +44,8 @@ export const products = [
     rating: 4.9,
     reviews: 94,
     badge: "오늘출발",
+    category: "팬츠/스커트",
+    subcategory: "데님",
     image: denimPantsImage,
   },
   {
@@ -52,6 +58,8 @@ export const products = [
     rating: 4.6,
     reviews: 77,
     badge: "NEW",
+    category: "아우터",
+    subcategory: "카디건",
     image: knitCardiganImage,
   },
   {
@@ -64,6 +72,8 @@ export const products = [
     rating: 4.8,
     reviews: 205,
     badge: "한정수량",
+    category: "가방",
+    subcategory: "숄더백",
     image: shoulderBagImage,
   },
   {
@@ -76,6 +86,8 @@ export const products = [
     rating: 4.7,
     reviews: 118,
     badge: "무료배송",
+    category: "슈즈",
+    subcategory: "스니커즈",
     image: maryJaneSneakersImage,
   },
 ];

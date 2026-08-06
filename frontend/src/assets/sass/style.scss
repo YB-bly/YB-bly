@@ -6,13 +6,12 @@
 @use "setting/var";
 
 
-// section // page
-@use "section/Home";
-
 // section // components
 @use "components/components";
+@use "components/admin-components";
 
 // pages
+@use "pages/home";
 @use "pages/login";
 @use "pages/signup";
 @use "pages/product-list";
@@ -25,4 +24,15 @@
 @use "pages/review-write";
 @use "pages/categories";
 @use "pages/wishlist";
+@use "pages/cart";
+@use "pages/checkout";
+@use "pages/payment-complete";
+@use "pages/admin-dashboard";
+@use "pages/admin-products";
+@use "pages/admin-product-upload";
+@use "pages/admin-orders";
+@use "pages/admin-users";
+@use "pages/admin-reviews";
+@use "pages/admin-categories";
+@use "pages/admin-mypage";
 

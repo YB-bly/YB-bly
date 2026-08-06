@@ -1,16 +1,25 @@
 import { Link } from "../router";
+import { useNavigate } from "../router-hooks";
 import AppHeader from "../components/AppHeader";
 import BottomNavigation from "../components/BottomNavigation";
 
-const MyPage = () => (
-  <div className="mypage-page">
-    <div className="container">
-      <AppHeader title="마이페이지" />
-      <main className="mypage">
+const MyPage = () => {
+  const navigate = useNavigate();
+
+  const logout = () => {
+    localStorage.removeItem("yb-bly-auth");
+    localStorage.removeItem("yb-bly-role");
+    navigate("/login", { replace: true });
+  };
+
+  return (
+    <div className="mypage-page">
+      <div className="container">
+        <AppHeader title="마이페이지" />
+        <main className="mypage">
         <section className="mypage__profile">
           <div className="mypage__avatar">Y</div>
           <div><p>안녕하세요,</p><h1>테스트 사용자 님</h1><span>Silver Member</span></div>
-          <button type="button" aria-label="프로필 수정">›</button>
         </section>
 
         <section className="mypage__wallet">
@@ -30,7 +39,7 @@ const MyPage = () => (
           <h2>쇼핑 활동</h2>
           <Link to="/orders"><span>▣</span>주문 내역<strong>›</strong></Link>
           <Link to="/reviews"><span>☆</span>나의 리뷰<strong>›</strong></Link>
-          <button type="button"><span>♡</span>찜한 상품<strong>›</strong></button>
+          <Link to="/wishlist"><span>♡</span>찜한 상품<strong>›</strong></Link>
           <button type="button"><span>◎</span>최근 본 상품<strong>›</strong></button>
         </section>
         <section className="mypage__menu">
@@ -38,10 +47,12 @@ const MyPage = () => (
           <button type="button"><span>?</span>문의 내역<strong>›</strong></button>
           <button type="button"><span>ⓘ</span>공지사항<strong>›</strong></button>
         </section>
-      </main>
-      <BottomNavigation />
+        <button className="mypage__logout" type="button" onClick={logout}>로그아웃</button>
+        </main>
+        <BottomNavigation />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default MyPage;

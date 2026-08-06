@@ -14,6 +14,17 @@ import Search from "./pages/Search";
 import Signup from "./pages/Signup";
 import Categories from "./pages/Categories";
 import Wishlist from "./pages/Wishlist";
+import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import PaymentComplete from "./pages/PaymentComplete";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminProducts from "./pages/AdminProducts";
+import AdminProductUpload from "./pages/AdminProductUpload";
+import AdminOrders from "./pages/AdminOrders";
+import AdminUsers from "./pages/AdminUsers";
+import AdminReviews from "./pages/AdminReviews";
+import AdminCategories from "./pages/AdminCategories";
+import AdminMyPage from "./pages/AdminMyPage";
 
 function App() {
   return <RouterProvider><AppRoutes /></RouterProvider>;
@@ -22,8 +33,15 @@ function App() {
 const AppRoutes = () => {
   const { pathname } = useRouter();
   const isLoggedIn = localStorage.getItem("yb-bly-auth") === "true";
+  const isAdmin = localStorage.getItem("yb-bly-role") === "admin";
+  const isAdminRoute = pathname === "/admin" || pathname.startsWith("/admin/");
+  const isProtectedUserRoute = ["/wishlist", "/mypage", "/checkout", "/payment/complete"].includes(pathname) || pathname.startsWith("/orders") || pathname.startsWith("/reviews");
 
-  if (["/wishlist", "/mypage"].includes(pathname) && !isLoggedIn) {
+  if (isAdminRoute && (!isLoggedIn || !isAdmin)) {
+    return <Login redirectTo={pathname} adminMode />;
+  }
+
+  if (isProtectedUserRoute && !isLoggedIn) {
     return <Login redirectTo={pathname} />;
   }
 
@@ -33,6 +51,9 @@ const AppRoutes = () => {
   if (pathname === "/mypage") return <MyPage />;
   if (pathname === "/categories") return <Categories />;
   if (pathname === "/wishlist") return <Wishlist />;
+  if (pathname === "/cart") return <Cart />;
+  if (pathname === "/checkout") return <Checkout />;
+  if (pathname === "/payment/complete") return <PaymentComplete />;
   if (pathname === "/products") return <ProductList />;
   if (/^\/products\/\d+$/.test(pathname)) return <ProductDetail />;
   if (pathname === "/search") return <Search />;
@@ -40,6 +61,14 @@ const AppRoutes = () => {
   if (/^\/orders\/\d+$/.test(pathname)) return <OrderDetail />;
   if (pathname === "/reviews") return <Reviews />;
   if (pathname === "/reviews/write") return <ReviewWrite />;
+  if (pathname === "/admin") return <AdminDashboard />;
+  if (pathname === "/admin/products") return <AdminProducts />;
+  if (pathname === "/admin/products/upload") return <AdminProductUpload />;
+  if (pathname === "/admin/orders") return <AdminOrders />;
+  if (pathname === "/admin/users") return <AdminUsers />;
+  if (pathname === "/admin/reviews") return <AdminReviews />;
+  if (pathname === "/admin/categories") return <AdminCategories />;
+  if (pathname === "/admin/mypage") return <AdminMyPage />;
 
   return (
     <div className="container">

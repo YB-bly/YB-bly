@@ -1,14 +1,27 @@
 import { useMemo, useState } from "react";
 import { useParams } from "../router-hooks";
+import { useNavigate } from "../router-hooks";
 import AppHeader from "../components/AppHeader";
 import { formatPrice, products } from "../data/products";
+import { addCartItem, saveCheckout } from "../data/shopStorage";
 
 const ProductDetail = () => {
   const { productId } = useParams();
+  const navigate = useNavigate();
   const product = useMemo(() => products.find((item) => item.id === Number(productId)) ?? products[0], [productId]);
   const [size, setSize] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [liked, setLiked] = useState(false);
+
+  const addToCart = () => {
+    addCartItem(product, size, quantity);
+    navigate("/cart");
+  };
+
+  const buyNow = () => {
+    saveCheckout({ items: [{ id: `${product.id}-${size}`, product, option: size, quantity }], coupon: null, subtotal: product.price * quantity, discount: 0, total: product.price * quantity });
+    navigate("/checkout");
+  };
 
   return (
     <div className="product-detail-page">
@@ -46,8 +59,8 @@ const ProductDetail = () => {
         </main>
         <div className="purchase-bar">
           <button className={`purchase-bar__like${liked ? " is-liked" : ""}`} type="button" onClick={() => setLiked(!liked)} aria-label="찜하기">{liked ? "♥" : "♡"}</button>
-          <button className="purchase-bar__cart" type="button" disabled={!size}>{size ? "장바구니 담기" : "사이즈를 선택해 주세요"}</button>
-          <button className="purchase-bar__buy" type="button" disabled={!size}>{size ? `${formatPrice(product.price * quantity)} 구매` : "바로 구매"}</button>
+          <button className="purchase-bar__cart" type="button" disabled={!size} onClick={addToCart}>{size ? "장바구니 담기" : "사이즈를 선택해 주세요"}</button>
+          <button className="purchase-bar__buy" type="button" disabled={!size} onClick={buyNow}>{size ? `${formatPrice(product.price * quantity)} 구매` : "바로 구매"}</button>
         </div>
       </div>
     </div>
