@@ -1,0 +1,5 @@
+.signup { padding-top: 32px; }
+.signup__progress { height: 4px; margin-bottom: 42px; overflow: hidden; border-radius: 999px; background: var(--gray-100); }
+.signup__progress-active { display: block; width: 50%; height: 100%; background: var(--main); }
+.signup__agreement { align-items: flex-start; padding: 16px; border-radius: 10px; background: var(--gray-50); line-height: 1.5; }
+.signup__agreement strong { color: var(--main); }

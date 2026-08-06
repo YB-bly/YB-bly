@@ -1,41 +1,47 @@
 import React from "react";
+import { Link } from "../router";
+import BottomNavigation from "../components/BottomNavigation";
+import mainBannerImage from "../assets/images/home/main-banner.jpg";
+import categoryDirectDeliveryImage from "../assets/images/home/category-direct-delivery.jpg";
+import categoryBeautyImage from "../assets/images/home/category-beauty.jpg";
+import categoryTopImage from "../assets/images/home/category-top.jpg";
+import categoryDressImage from "../assets/images/home/category-dress.jpg";
+import categoryPantsImage from "../assets/images/home/category-pants.jpg";
+import categorySkirtImage from "../assets/images/home/category-skirt.jpg";
+import recommendDenimImage from "../assets/images/home/recommend-denim.jpg";
+import recommendWideDenimImage from "../assets/images/home/recommend-wide-denim.jpg";
+import recommendBeautyDeviceImage from "../assets/images/home/recommend-beauty-device.jpg";
 
 const categories = [
   {
     id: 1,
     name: "직진배송",
-    image:
-      "https://images.unsplash.com/photo-1557682250-33bd709cbe85?auto=format&fit=crop&w=200&q=80",
+    image: categoryDirectDeliveryImage,
   },
   {
     id: 2,
     name: "뷰티",
-    image:
-      "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=200&q=80",
+    image: categoryBeautyImage,
   },
   {
     id: 3,
     name: "상의",
-    image:
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=200&q=80",
+    image: categoryTopImage,
   },
   {
     id: 4,
     name: "원피스",
-    image:
-      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=200&q=80",
+    image: categoryDressImage,
   },
   {
     id: 5,
     name: "바지",
-    image:
-      "https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=200&q=80",
+    image: categoryPantsImage,
   },
   {
     id: 6,
     name: "스커트",
-    image:
-      "https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?auto=format&fit=crop&w=200&q=80",
+    image: categorySkirtImage,
   },
 ];
 
@@ -46,8 +52,7 @@ const products = [
     name: "[BEST] 와이드 데님 커브 진",
     discount: "15%",
     price: "63,320",
-    image:
-      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=700&q=85",
+    image: recommendDenimImage,
   },
   {
     id: 2,
@@ -55,8 +60,7 @@ const products = [
     name: "[라이브 앵콜세일] MADE 와이드 데님",
     discount: "44%",
     price: "21,560",
-    image:
-      "https://images.unsplash.com/photo-1548624149-f6c97f5b36d5?auto=format&fit=crop&w=700&q=85",
+    image: recommendWideDenimImage,
   },
   {
     id: 3,
@@ -64,8 +68,7 @@ const products = [
     name: "라스트찬스 홈케어 뷰티 디바이스",
     discount: "59%",
     price: "106,480",
-    image:
-      "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=700&q=85",
+    image: recommendBeautyDeviceImage,
   },
 ];
 
@@ -77,21 +80,13 @@ const Home = () => {
           <h1 className="home-logo">YB-bly</h1>
 
           <div className="home-header-actions">
-            <button
-              type="button"
+            <Link
+              to="/search"
               className="home-header-button"
-              aria-label="이미지 검색"
-            >
-              ◎
-            </button>
-
-            <button
-              type="button"
-              className="home-header-button"
-              aria-label="검색"
+              aria-label="상품 검색"
             >
               ⌕
-            </button>
+            </Link>
 
             <button
               type="button"
@@ -107,7 +102,7 @@ const Home = () => {
           <section className="home-banner">
             <img
               className="home-banner-image"
-              src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=1300&q=90"
+              src={mainBannerImage}
               alt="여름 뷰티 상품"
             />
 
@@ -148,9 +143,9 @@ const Home = () => {
             <div className="home-product-list">
               {products.map((product) => (
                 <article className="home-product-card" key={product.id}>
-                  <div className="home-product-image">
+                  <Link to={`/products/${product.id}`} className="home-product-image">
                     <img src={product.image} alt={product.name} />
-                  </div>
+                  </Link>
 
                   <div className="home-product-info">
                     <h3 className="home-product-brand">{product.brand}</h3>
@@ -171,27 +166,7 @@ const Home = () => {
           </section>
         </main>
 
-        <nav className="bottom-navigation">
-          <button type="button" className="bottom-navigation-item">
-            <span className="bottom-navigation-icon">Y</span>
-            <span>홈</span>
-          </button>
-
-          <button type="button" className="bottom-navigation-item">
-            <span className="bottom-navigation-icon">☰</span>
-            <span>카테고리</span>
-          </button>
-
-          <button type="button" className="bottom-navigation-item">
-            <span className="bottom-navigation-icon">♡</span>
-            <span>찜</span>
-          </button>
-
-          <button type="button" className="bottom-navigation-item">
-            <span className="bottom-navigation-icon">♙</span>
-            <span>마이페이지</span>
-          </button>
-        </nav>
+        <BottomNavigation />
       </div>
     </div>
   );

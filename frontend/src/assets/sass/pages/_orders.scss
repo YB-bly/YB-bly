@@ -1,0 +1,23 @@
+.orders { min-height: calc(100vh - var(--header-height)); padding: 22px 24px 60px; background: var(--gray-50); }
+.orders__filter { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.orders__filter button { padding: 9px 13px; border: 1px solid var(--gray-300); border-radius: 8px; background: var(--white); font-size: 13px; }
+.orders__filter span { color: var(--gray-500); font-size: 13px; }
+.orders__list { display: grid; gap: 14px; }
+.order-card { padding: 23px; border-radius: 14px; background: var(--white); }
+.order-card header { display: flex; justify-content: space-between; padding-bottom: 17px; border-bottom: 1px solid var(--gray-200); }
+.order-card header div { display: flex; flex-direction: column; gap: 4px; }
+.order-card header time { font-weight: 800; }
+.order-card header span, .order-card header button { color: var(--gray-500); font-size: 11px; }
+.order-card__status { display: block; margin: 18px 0 13px; color: var(--main); font-size: 15px; }
+.order-card__product { display: grid; grid-template-columns: 92px 1fr; gap: 14px; }
+.order-card__product img { width: 92px; height: 112px; border-radius: 8px; object-fit: cover; }
+.order-card__product div { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; min-width: 0; }
+.order-card__product strong { font-size: 13px; }
+.order-card__product p { width: 100%; overflow: hidden; font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
+.order-card__product span { color: var(--gray-500); font-size: 12px; }
+.order-card__product b { margin-top: auto; font-size: 15px; }
+.order-card__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 19px; }
+.order-card__actions > * { display: grid; place-items: center; height: 43px; border: 1px solid var(--gray-300); border-radius: 8px; font-size: 13px; font-weight: 700; }
+.order-card__actions a { border-color: var(--black); background: var(--black); color: var(--white); }
+
+@media (max-width: 500px) { .orders { padding: 18px 14px 50px; } .order-card { padding: 19px 16px; } }

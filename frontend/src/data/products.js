@@ -1,0 +1,83 @@
+import flowerTshirtImage from "../assets/images/products/flower-tshirt.jpg";
+import linenShirtImage from "../assets/images/products/linen-shirt.jpg";
+import denimPantsImage from "../assets/images/products/denim-pants.jpg";
+import knitCardiganImage from "../assets/images/products/knit-cardigan.jpg";
+import shoulderBagImage from "../assets/images/products/shoulder-bag.jpg";
+import maryJaneSneakersImage from "../assets/images/products/mary-jane-sneakers.jpg";
+
+export const products = [
+  {
+    id: 1,
+    brand: "Mardi Mercredi",
+    name: "플라워 마르디 반팔 티셔츠",
+    price: 42000,
+    originalPrice: 56000,
+    discount: 25,
+    rating: 4.8,
+    reviews: 328,
+    badge: "BEST",
+    image: flowerTshirtImage,
+  },
+  {
+    id: 2,
+    brand: "YOUTH",
+    name: "클래식 린넨 오버 셔츠",
+    price: 67900,
+    originalPrice: 97000,
+    discount: 30,
+    rating: 4.7,
+    reviews: 141,
+    badge: "무료배송",
+    image: linenShirtImage,
+  },
+  {
+    id: 3,
+    brand: "LOEIL",
+    name: "핀턱 와이드 데님 팬츠",
+    price: 49200,
+    originalPrice: 61500,
+    discount: 20,
+    rating: 4.9,
+    reviews: 94,
+    badge: "오늘출발",
+    image: denimPantsImage,
+  },
+  {
+    id: 4,
+    brand: "AMOMENTO",
+    name: "라이트 썸머 니트 카디건",
+    price: 76800,
+    originalPrice: 96000,
+    discount: 20,
+    rating: 4.6,
+    reviews: 77,
+    badge: "NEW",
+    image: knitCardiganImage,
+  },
+  {
+    id: 5,
+    brand: "SIENNE",
+    name: "시그니처 미니 숄더백",
+    price: 89100,
+    originalPrice: 99000,
+    discount: 10,
+    rating: 4.8,
+    reviews: 205,
+    badge: "한정수량",
+    image: shoulderBagImage,
+  },
+  {
+    id: 6,
+    brand: "ROCKFISH",
+    name: "메리제인 스니커즈",
+    price: 59000,
+    originalPrice: 69000,
+    discount: 14,
+    rating: 4.7,
+    reviews: 118,
+    badge: "무료배송",
+    image: maryJaneSneakersImage,
+  },
+];
+
+export const formatPrice = (price) => `${price.toLocaleString("ko-KR")}원`;

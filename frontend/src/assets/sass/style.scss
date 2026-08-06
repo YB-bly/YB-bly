@@ -1,13 +1,28 @@
 @charset "UTF-8";
 
 // setting
-@import "setting/reset";
-@import "setting/common";
-@import "setting/var";
+@use "setting/reset";
+@use "setting/common";
+@use "setting/var";
 
 
 // section // page
-@import "../sass/section/Home.scss"
+@use "section/Home";
 
 // section // components
+@use "components/components";
+
+// pages
+@use "pages/login";
+@use "pages/signup";
+@use "pages/product-list";
+@use "pages/search";
+@use "pages/product-detail";
+@use "pages/mypage";
+@use "pages/orders";
+@use "pages/order-detail";
+@use "pages/reviews";
+@use "pages/review-write";
+@use "pages/categories";
+@use "pages/wishlist";
 
