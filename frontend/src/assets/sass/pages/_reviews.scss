@@ -1,0 +1,28 @@
+.reviews { padding-bottom: 60px; }
+.reviews__summary { display: grid; grid-template-columns: 1fr 1fr; align-items: center; margin: 24px; padding: 25px; border-radius: 14px; background: var(--gray-50); }
+.reviews__summary > div { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 4px 12px; }
+.reviews__summary > div strong { grid-row: span 2; font-size: 38px; font-weight: 900; }
+.reviews__summary > div span { color: #e6a100; }
+.reviews__summary > div p { color: var(--gray-500); font-size: 12px; }
+.reviews__summary > a { padding: 14px; border-left: 1px solid var(--gray-300); text-align: right; font-size: 13px; }
+.reviews__summary > a strong { margin-left: 5px; color: var(--main); }
+.reviews__tabs { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--gray-200); }
+.reviews__tabs button { position: relative; height: 53px; color: var(--gray-500); font-weight: 700; }
+.reviews__tabs button.is-active { color: var(--black); }
+.reviews__tabs button.is-active::after { position: absolute; right: 20%; bottom: -1px; left: 20%; height: 3px; background: var(--black); content: ""; }
+.review-card { padding: 28px 24px; border-bottom: 8px solid var(--gray-100); }
+.review-card header { display: grid; grid-template-columns: 56px 1fr auto; gap: 12px; }
+.review-card header img { width: 56px; height: 68px; border-radius: 6px; object-fit: cover; }
+.review-card header div { min-width: 0; }
+.review-card header strong { font-size: 12px; }
+.review-card header p { margin: 5px 0; overflow: hidden; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.review-card header span { color: var(--gray-500); font-size: 11px; }
+.review-card__meta { display: flex; gap: 10px; margin: 20px 0 12px; }
+.review-card__meta span { color: #e6a100; letter-spacing: 1px; }
+.review-card__meta time { color: var(--gray-500); font-size: 12px; }
+.review-card__text { line-height: 1.7; }
+.review-card__photos { display: flex; gap: 8px; margin-top: 15px; }
+.review-card__photos img { width: 110px; height: 110px; border-radius: 8px; object-fit: cover; }
+.review-card__help { margin-top: 16px; padding: 8px 12px; border: 1px solid var(--gray-300); border-radius: 999px; font-size: 12px; }
+
+@media (max-width: 500px) { .reviews__summary { grid-template-columns: 1fr; gap: 20px; } .reviews__summary > a { border-top: 1px solid var(--gray-300); border-left: 0; text-align: left; } }
