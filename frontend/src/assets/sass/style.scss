@@ -7,22 +7,23 @@
 
 
 // section // page
-@use "section/Home";
+@import "../sass/section/_mainhome.scss";
+
 
 // section // components
-@use "components/components";
+@import "components/components";
 
 // pages
-@use "pages/login";
-@use "pages/signup";
-@use "pages/product-list";
-@use "pages/search";
-@use "pages/product-detail";
-@use "pages/mypage";
-@use "pages/orders";
-@use "pages/order-detail";
-@use "pages/reviews";
-@use "pages/review-write";
-@use "pages/categories";
-@use "pages/wishlist";
+@import "pages/login";
+@import "pages/signup";
+@import "pages/product-list";
+@import "pages/search";
+@import "pages/product-detail";
+@import "pages/mypage";
+@import "pages/orders";
+@import "pages/order-detail";
+@import"pages/reviews";
+@import "pages/review-write";
+@import "pages/categories";
+@import "pages/wishlist";
 

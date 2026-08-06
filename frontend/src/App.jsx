@@ -1,7 +1,5 @@
-import "./assets/sass/style.scss";
 import { RouterProvider } from "./router";
 import { useRouter } from "./router-hooks";
-import Home from "./pages/Home";
 import Login from "./pages/Login";
 import MyPage from "./pages/MyPage";
 import Orders from "./pages/Orders";
@@ -14,6 +12,8 @@ import Search from "./pages/Search";
 import Signup from "./pages/Signup";
 import Categories from "./pages/Categories";
 import Wishlist from "./pages/Wishlist";
+import Home from "./pages/MainHome";
+import "./assets/sass/style.scss";
 
 function App() {
   return <RouterProvider><AppRoutes /></RouterProvider>;
