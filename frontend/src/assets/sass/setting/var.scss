@@ -16,13 +16,20 @@
   --gray-700: #555555;
   --gray-900: #222222;
 
+
   // 포인트 색상 - 민트 & 옐로
   --main: #00a88f;
-  --main-dark: #007d6e;
+  --main-dark1: #007d6e;
   --main-soft: #e4faf6;
   --accent: #ffd84d;
   --accent-soft: #fff8d8;
   --red: #ff3b3b;
+  --main-dark: #15bfd9;
+  --accent: var(--main);
+  --red: #ff3d32;
+  --main: #78edff;
+  --lemon: hsl(59, 100%, 85%);
+
 
   // 투명
   --none: transparent;
