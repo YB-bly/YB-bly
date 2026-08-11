@@ -16,6 +16,8 @@
 .quantity-control > * { display: grid; place-items: center; font-size: 12px; }
 .cart__coupon > div { display: grid; grid-template-columns: 1fr 72px; gap: 7px; margin-top: 15px; }
 .cart__coupon input { height: 46px; padding: 0 14px; border: 1px solid var(--gray-300); border-radius: 8px; }
+.cart__coupon select { min-width: 0; height: 46px; padding: 0 10px; border: 1px solid var(--gray-300); border-radius: 8px; background: var(--white); }
+.cart__coupon button:disabled { opacity: .4; }
 .cart__coupon button { border-radius: 8px; background: var(--black); color: var(--white); font-size: 13px; font-weight: 800; }
 .cart__coupon > p { margin-top: 9px; color: var(--red); font-size: 12px; }
 .cart__coupon > p.is-success { color: var(--main-dark); }

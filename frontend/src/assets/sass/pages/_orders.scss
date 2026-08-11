@@ -1,6 +1,6 @@
 .orders { min-height: calc(100vh - var(--header-height)); padding: 22px 24px 60px; background: var(--gray-50); }
 .orders__filter { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
-.orders__filter button { padding: 9px 13px; border: 1px solid var(--gray-300); border-radius: 8px; background: var(--white); font-size: 13px; }
+.orders__filter button, .orders__filter select { padding: 9px 13px; border: 1px solid var(--gray-300); border-radius: 8px; background: var(--white); font-size: 13px; }
 .orders__filter span { color: var(--gray-500); font-size: 13px; }
 .orders__list { display: grid; gap: 14px; }
 .order-card { padding: 23px; border-radius: 14px; background: var(--white); }
@@ -21,3 +21,15 @@
 .order-card__actions a { border-color: var(--black); background: var(--black); color: var(--white); }
 
 @media (max-width: 500px) { .orders { padding: 18px 14px 50px; } .order-card { padding: 19px 16px; } }
+.orders__tracking { position: fixed; z-index: 100; inset: 0; display: grid; place-items: center; padding: 20px; background: rgba(0,0,0,.45); }
+.orders__tracking > div { width: min(100%, 430px); padding: 22px; border-radius: 14px; background: var(--white); }
+.orders__tracking header { display: flex; align-items: flex-start; justify-content: space-between; }
+.orders__tracking header div { display: flex; flex-direction: column; gap: 4px; }
+.orders__tracking header span, .orders__tracking small { color: var(--gray-500); font-size: 10px; }
+.orders__tracking header button { font-size: 22px; }
+.orders__tracking > div > p { margin: 14px 0; font-size: 12px; }
+.orders__tracking ol { display: grid; grid-template-columns: repeat(4,1fr); margin: 22px 0; }
+.orders__tracking li { display: flex; align-items: center; flex-direction: column; gap: 7px; color: var(--gray-400); font-size: 10px; text-align: center; }
+.orders__tracking li b { display: grid; width: 25px; height: 25px; place-items: center; border-radius: 50%; background: var(--gray-200); }
+.orders__tracking li.is-active { color: var(--main-dark); font-weight: 800; }
+.orders__tracking li.is-active b { background: var(--main); color: var(--white); }

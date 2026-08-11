@@ -3,15 +3,12 @@ import { Link } from "../router";
 import AppHeader from "../components/AppHeader";
 import { formatPrice } from "../data/products";
 import { getCart, saveCart, saveCheckout } from "../data/shopStorage";
-
-const coupons = {
-  WELCOME10: { label: "첫 구매 10% 할인", rate: 0.1 },
-  ONCE20: { label: "1회 한정 20% 할인", rate: 0.2 },
-};
+import { getCoupons } from "../data/shopRepository";
 
 const Cart = () => {
   const [items, setItems] = useState(getCart);
-  const [couponInput, setCouponInput] = useState("");
+  const coupons = getCoupons();
+  const [couponId, setCouponId] = useState("");
   const [coupon, setCoupon] = useState(null);
   const [couponMessage, setCouponMessage] = useState("");
   const subtotal = useMemo(() => items.reduce((sum, item) => sum + item.product.price * item.quantity, 0), [items]);
@@ -29,7 +26,7 @@ const Cart = () => {
   };
 
   const applyCoupon = () => {
-    const found = coupons[couponInput.trim().toUpperCase()];
+    const found = coupons.find((item) => Number(item.id) === Number(couponId) && item.status === "available");
     if (!found) {
       setCoupon(null);
       setCouponMessage("사용할 수 없는 쿠폰이에요.");
@@ -39,7 +36,7 @@ const Cart = () => {
     setCouponMessage(`${found.label} 쿠폰이 적용됐어요.`);
   };
 
-  const prepareCheckout = () => saveCheckout({ items, coupon: coupon ? { ...coupon, code: couponInput.trim().toUpperCase() } : null, subtotal, discount, total });
+  const prepareCheckout = () => saveCheckout({ items, coupon, subtotal, discount, total });
 
   return (
     <div className="cart-page">
@@ -64,7 +61,7 @@ const Cart = () => {
                 ))}
               </section>
               <section className="cart__coupon">
-                <h2>할인 쿠폰</h2><div><input value={couponInput} onChange={(event) => setCouponInput(event.target.value)} placeholder="쿠폰 코드를 입력하세요" /><button type="button" onClick={applyCoupon}>적용</button></div>
+                <h2>보유 쿠폰</h2><div><select value={couponId} onChange={(event) => { setCouponId(event.target.value); setCoupon(null); setCouponMessage(""); }}><option value="">쿠폰을 선택하세요</option>{coupons.map((item) => <option value={item.id} disabled={item.status !== "available"} key={item.id}>{item.label} ({item.code}){item.status === "used" ? " · 사용 완료" : ` · ${item.expiresAt}까지`}</option>)}</select><button type="button" disabled={!couponId} onClick={applyCoupon}>적용</button></div>
                 {couponMessage && <p className={coupon ? "is-success" : ""}>{couponMessage}</p>}
               </section>
               <section className="cart__summary">

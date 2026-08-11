@@ -24,6 +24,12 @@ import AdminReviews from "./pages/AdminReviews";
 import AdminCategories from "./pages/AdminCategories";
 import AdminMyPage from "./pages/AdminMyPage";
 import MainHome from "./pages/MainHome";
+import RecentProducts from "./pages/RecentProducts";
+import Inquiries from "./pages/Inquiries";
+import Notices from "./pages/Notices";
+import BrandHome from "./pages/BrandHome";
+import AdminSecurity from "./pages/AdminSecurity";
+import AdminOrderDetail from "./pages/AdminOrderDetail";
 import "./assets/sass/style.scss";
 
 function App() {
@@ -35,7 +41,7 @@ const AppRoutes = () => {
   const isLoggedIn = localStorage.getItem("yb-bly-auth") === "true";
   const isAdmin = localStorage.getItem("yb-bly-role") === "admin";
   const isAdminRoute = pathname === "/admin" || pathname.startsWith("/admin/");
-  const isProtectedUserRoute = ["/wishlist", "/mypage", "/checkout", "/payment/complete"].includes(pathname) || pathname.startsWith("/orders") || pathname.startsWith("/reviews");
+  const isProtectedUserRoute = ["/wishlist", "/mypage", "/checkout", "/payment/complete", "/recent", "/inquiries"].includes(pathname) || pathname.startsWith("/orders") || pathname.startsWith("/reviews");
 
   if (isAdminRoute && (!isLoggedIn || !isAdmin)) {
     return <Login redirectTo={pathname} adminMode />;
@@ -57,6 +63,10 @@ const AppRoutes = () => {
   if (pathname === "/products") return <ProductList />;
   if (/^\/products\/\d+$/.test(pathname)) return <ProductDetail />;
   if (pathname === "/search") return <Search />;
+  if (pathname === "/recent") return <RecentProducts />;
+  if (pathname === "/inquiries") return <Inquiries />;
+  if (pathname === "/notices") return <Notices />;
+  if (pathname === "/brands") return <BrandHome />;
   if (pathname === "/orders") return <Orders />;
   if (/^\/orders\/\d+$/.test(pathname)) return <OrderDetail />;
   if (pathname === "/reviews") return <Reviews />;
@@ -64,11 +74,14 @@ const AppRoutes = () => {
   if (pathname === "/admin") return <AdminDashboard />;
   if (pathname === "/admin/products") return <AdminProducts />;
   if (pathname === "/admin/products/upload") return <AdminProductUpload />;
+  if (/^\/admin\/products\/\d+\/edit$/.test(pathname)) return <AdminProductUpload />;
   if (pathname === "/admin/orders") return <AdminOrders />;
+  if (/^\/admin\/orders\/\d+$/.test(pathname)) return <AdminOrderDetail />;
   if (pathname === "/admin/users") return <AdminUsers />;
   if (pathname === "/admin/reviews") return <AdminReviews />;
   if (pathname === "/admin/categories") return <AdminCategories />;
   if (pathname === "/admin/mypage") return <AdminMyPage />;
+  if (pathname === "/admin/security") return <AdminSecurity />;
 
   return (
     <div className="container">

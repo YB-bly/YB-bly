@@ -69,8 +69,7 @@ const ProductCard = ({
           </p>
 
           <div className="product-card__tags">
-            <span>무료배송</span>
-            <span>마일리지 2배</span>
+            {(product.tags?.length ? product.tags : ["무료배송"]).slice(0, 2).map((tag) => <span key={tag}>{tag}</span>)}
           </div>
 
           <p className="product-card__rating">

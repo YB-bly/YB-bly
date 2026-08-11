@@ -1,6 +1,7 @@
 const CART_KEY = "yb-bly-cart";
 const CHECKOUT_KEY = "yb-bly-checkout";
 const ORDERS_KEY = "yb-bly-mock-orders";
+const ORDER_STATUS_KEY = "yb-bly-order-statuses";
 
 const read = (key, fallback) => {
   try {
@@ -38,4 +39,7 @@ export const saveMockOrder = (order) => {
 export const updateMockOrderStatus = (orderId, status) => {
   const orders = getMockOrders().map((order) => Number(order.id) === Number(orderId) ? { ...order, status } : order);
   localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+  localStorage.setItem(ORDER_STATUS_KEY, JSON.stringify({ ...read(ORDER_STATUS_KEY, {}), [orderId]: status }));
 };
+
+export const applyOrderStatus = (orders) => { const statuses = read(ORDER_STATUS_KEY, {}); return orders.map((order) => statuses[order.id] ? { ...order, status: statuses[order.id] } : order); };

@@ -8,6 +8,8 @@ import BottomNavigation from "../components/BottomNavigation";
 const Login = ({ redirectTo, adminMode = false }) => {
   const navigate = useNavigate();
   const [error, setError] = useState("");
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [resetMessage, setResetMessage] = useState("");
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -29,6 +31,8 @@ const Login = ({ redirectTo, adminMode = false }) => {
     localStorage.setItem("yb-bly-role", email === "admin@yb-bly.com" && password === "admin1234" ? "admin" : "user");
     navigate(redirectTo || "/mypage", { replace: true });
   };
+
+  const requestReset = (event) => { event.preventDefault(); const email = new FormData(event.currentTarget).get("resetEmail")?.trim(); if (email) setResetMessage("입력한 이메일이 등록되어 있다면 재설정 안내가 발송됩니다. (모의 전송)"); };
 
   return (
     <div className="login-page">
@@ -52,10 +56,11 @@ const Login = ({ redirectTo, adminMode = false }) => {
               <label className="check-field">
                 <input type="checkbox" /> <span>로그인 상태 유지</span>
               </label>
-              <button type="button" className="text-button">비밀번호 찾기</button>
+              <button type="button" className="text-button" onClick={() => { setForgotOpen(!forgotOpen); setResetMessage(""); }}>비밀번호 찾기</button>
             </div>
             <button className="primary-button" type="submit">로그인</button>
           </form>
+          {forgotOpen && <div className="login__forgot"><strong>비밀번호 재설정</strong><p>가입한 이메일을 입력해 주세요. 계정 존재 여부와 관계없이 동일한 안내를 표시합니다.</p><form onSubmit={requestReset}><input required name="resetEmail" type="email" placeholder="example@yb-bly.com" /><button type="submit">안내 받기</button></form>{resetMessage && <span>{resetMessage}</span>}</div>}
 
           <p className="auth-footer">아직 회원이 아니신가요? <Link to="/signup">회원가입</Link></p>
         </main>

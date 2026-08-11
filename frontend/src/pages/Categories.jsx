@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { Link } from "../router";
 import AppHeader from "../components/AppHeader";
 import BottomNavigation from "../components/BottomNavigation";
+import { getManagedCategories } from "../data/shopRepository";
 
 const categoryGroups = {
   패션: {
@@ -31,15 +32,17 @@ const categoryGroups = {
 };
 
 const Categories = () => {
+  const fashionGroups = Object.fromEntries(getManagedCategories().filter((category) => category.visible).map((category) => [category.name, categoryGroups.패션[category.name] ?? []]));
+  const visibleGroups = { ...categoryGroups, 패션: fashionGroups };
   const [tab, setTab] = useState("패션");
-  const [section, setSection] = useState(Object.keys(categoryGroups.패션)[0]);
+  const [section, setSection] = useState(Object.keys(fashionGroups)[0]);
   const groupRefs = useRef({});
   const contentRef = useRef(null);
-  const groups = categoryGroups[tab];
+  const groups = visibleGroups[tab];
 
   const changeTab = (nextTab) => {
     setTab(nextTab);
-    setSection(Object.keys(categoryGroups[nextTab])[0]);
+    setSection(Object.keys(visibleGroups[nextTab])[0]);
     requestAnimationFrame(() => contentRef.current?.scrollTo({ top: 0, behavior: "smooth" }));
   };
 

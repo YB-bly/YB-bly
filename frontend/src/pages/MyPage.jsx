@@ -40,12 +40,12 @@ const MyPage = () => {
           <Link to="/orders"><span>▣</span>주문 내역<strong>›</strong></Link>
           <Link to="/reviews"><span>☆</span>나의 리뷰<strong>›</strong></Link>
           <Link to="/wishlist"><span>♡</span>찜한 상품<strong>›</strong></Link>
-          <button type="button"><span>◎</span>최근 본 상품<strong>›</strong></button>
+          <Link to="/recent"><span>◎</span>최근 본 상품<strong>›</strong></Link>
         </section>
         <section className="mypage__menu">
           <h2>고객 지원</h2>
-          <button type="button"><span>?</span>문의 내역<strong>›</strong></button>
-          <button type="button"><span>ⓘ</span>공지사항<strong>›</strong></button>
+          <Link to="/inquiries"><span>?</span>문의 내역<strong>›</strong></Link>
+          <Link to="/notices"><span>ⓘ</span>공지사항<strong>›</strong></Link>
         </section>
         <button className="mypage__logout" type="button" onClick={logout}>로그아웃</button>
         </main>

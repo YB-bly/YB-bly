@@ -3,12 +3,14 @@ import { useNavigate } from "../router-hooks";
 import AppHeader from "../components/AppHeader";
 import { formatPrice } from "../data/products";
 import { clearCheckout, getCheckout, saveCart, saveMockOrder } from "../data/shopStorage";
+import { markCouponUsed } from "../data/shopRepository";
 
 const Checkout = () => {
   const navigate = useNavigate();
   const checkout = getCheckout();
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const handlePayment = (event) => {
     event.preventDefault();
@@ -16,12 +18,14 @@ const Checkout = () => {
       setError("결제할 상품이 없습니다. 장바구니에서 다시 진행해 주세요.");
       return;
     }
+    if (submitting) return;
     const form = new FormData(event.currentTarget);
     if (!["name", "phone", "address"].every((key) => form.get(key)?.trim())) {
       setError("배송지 정보를 모두 입력해 주세요.");
       return;
     }
 
+    setSubmitting(true);
     const now = Date.now();
     const order = {
       id: now,
@@ -42,6 +46,7 @@ const Checkout = () => {
       paymentMethod,
     };
     saveMockOrder(order);
+    if (checkout.coupon?.id) markCouponUsed(checkout.coupon.id);
     saveCart([]);
     clearCheckout();
     navigate(`/payment/complete?order=${order.id}`, { replace: true });
@@ -57,7 +62,7 @@ const Checkout = () => {
           <section className="checkout__section"><h2>결제 수단</h2><div className="checkout__payments">{[{ id: "card", label: "신용·체크카드" }, { id: "bank", label: "무통장 입금" }, { id: "mock", label: "YB 간편결제" }].map((method) => <button className={paymentMethod === method.id ? "is-selected" : ""} type="button" key={method.id} onClick={() => setPaymentMethod(method.id)}>{method.label}</button>)}</div><p className="checkout__mock-notice">실제 결제는 발생하지 않으며, 결제 버튼을 누르면 주문 상태만 ‘결제완료’로 변경됩니다.</p></section>
           <section className="checkout__section checkout__total"><h2>최종 결제 금액</h2><dl><dt>상품 금액</dt><dd>{formatPrice(checkout?.subtotal ?? 0)}</dd><dt>쿠폰 할인</dt><dd>-{formatPrice(checkout?.discount ?? 0)}</dd><dt>총 결제 금액</dt><dd>{formatPrice(checkout?.total ?? 0)}</dd></dl></section>
           {error && <p className="checkout__error">{error}</p>}
-          <div className="checkout__submit"><button type="submit">{formatPrice(checkout?.total ?? 0)} 모의 결제하기</button></div>
+          <div className="checkout__submit"><button type="submit" disabled={submitting}>{submitting ? "주문 처리 중…" : `${formatPrice(checkout?.total ?? 0)} 모의 결제하기`}</button></div>
         </form>
       </div>
     </div>

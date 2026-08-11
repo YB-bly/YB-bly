@@ -15,3 +15,15 @@ export const useOrderParams = () => {
   const match = pathname.match(/^\/orders\/(\d+)$/);
   return { orderId: match?.[1] };
 };
+
+export const useAdminProductParams = () => {
+  const { pathname } = useRouter();
+  const match = pathname.match(/^\/admin\/products\/(\d+)\/edit$/);
+  return { productId: match?.[1] };
+};
+
+export const useAdminOrderParams = () => {
+  const { pathname } = useRouter();
+  const match = pathname.match(/^\/admin\/orders\/(\d+)$/);
+  return { orderId: match?.[1] };
+};
