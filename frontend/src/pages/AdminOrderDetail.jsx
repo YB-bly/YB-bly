@@ -1,0 +1,11 @@
+import { useState } from "react";
+import AdminHeader from "../components/AdminHeader";
+import AdminBottomNavigation from "../components/AdminBottomNavigation";
+import { adminOrders } from "../data/adminData";
+import { formatPrice } from "../data/products";
+import { applyOrderStatus, getMockOrders, updateMockOrderStatus } from "../data/shopStorage";
+import { useAdminOrderParams } from "../router-hooks";
+
+const statuses = ["결제완료", "배송준비", "배송중", "배송완료", "취소"];
+const AdminOrderDetail = () => { const { orderId } = useAdminOrderParams(); const found = applyOrderStatus([...getMockOrders(), ...adminOrders]).find((order) => Number(order.id) === Number(orderId)); const [order, setOrder] = useState(found); if (!order) return <div className="admin-page"><div className="container"><AdminHeader title="주문 상세" back /><main className="empty-state"><span>!</span><strong>주문을 찾을 수 없어요</strong></main></div></div>; const change = (status) => { updateMockOrderStatus(order.id, status); setOrder({ ...order, status }); }; return <div className="admin-page"><div className="container"><AdminHeader title="주문 상세" back /><main className="admin-order-detail"><section className="admin-order-detail__hero"><div><span>주문번호</span><h1>{order.number}</h1><p>{order.date} · 내부 ID #{order.id}</p></div><select value={order.status} onChange={(e) => change(e.target.value)} aria-label="주문 상태 변경">{statuses.map((status) => <option key={status}>{status}</option>)}</select></section><section><h2>주문 상품</h2><div className="admin-order-product"><img src={order.product.image} alt={order.product.name} /><div><strong>{order.product.name}</strong><span>{order.option} · {order.quantity ?? 1}개</span><b>{formatPrice(order.total ?? order.amount ?? order.product.price)}</b></div></div></section><section><h2>주문자·배송지</h2><dl><dt>주문자</dt><dd>{order.customer ?? order.recipient ?? "테스트 사용자"}</dd><dt>연락처</dt><dd>{order.phone ?? "010-0000-0000"}</dd><dt>주소</dt><dd>{order.address ?? "등록된 테스트 배송지"}</dd></dl></section><section><h2>결제 내역</h2><dl><dt>상품 금액</dt><dd>{formatPrice(order.subtotal ?? order.amount ?? order.product.price)}</dd><dt>쿠폰 할인</dt><dd>-{formatPrice(order.discount ?? 0)}</dd><dt>최종 결제</dt><dd><strong>{formatPrice(order.total ?? order.amount ?? order.product.price)}</strong></dd></dl></section></main><AdminBottomNavigation /></div></div>; };
+export default AdminOrderDetail;

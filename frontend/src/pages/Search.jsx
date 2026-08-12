@@ -1,16 +1,17 @@
 import { useMemo, useState } from "react";
 import AppHeader from "../components/AppHeader";
 import ProductCard from "../components/ProductCard";
-import { products } from "../data/products";
+import { getManagedProducts } from "../data/shopRepository";
 
-const recentKeywords = ["여름 셔츠", "메리제인", "미니백"];
+const initialRecentKeywords = ["여름 셔츠", "메리제인", "미니백"];
 
 const Search = () => {
   const [query, setQuery] = useState("");
+  const [recentKeywords, setRecentKeywords] = useState(initialRecentKeywords);
   const results = useMemo(() => {
     const keyword = query.trim().toLowerCase();
     if (!keyword) return [];
-    return products.filter((product) => `${product.brand} ${product.name}`.toLowerCase().includes(keyword));
+    return getManagedProducts().filter((product) => product.status !== "판매중지" && `${product.brand} ${product.name} ${(product.tags ?? []).join(" ")}`.toLowerCase().includes(keyword));
   }, [query]);
 
   return (
@@ -27,8 +28,8 @@ const Search = () => {
           {!query ? (
             <>
               <section className="search__section">
-                <div className="section-heading"><h2>최근 검색어</h2><button type="button">전체 삭제</button></div>
-                <div className="chip-list">{recentKeywords.map((keyword) => <button className="chip" type="button" key={keyword} onClick={() => setQuery(keyword)}>{keyword} ×</button>)}</div>
+                <div className="section-heading"><h2>최근 검색어</h2><button type="button" disabled={!recentKeywords.length} onClick={() => setRecentKeywords([])}>전체 삭제</button></div>
+                <div className="chip-list">{recentKeywords.map((keyword) => <button className="chip" type="button" key={keyword} onClick={() => setQuery(keyword)}>{keyword}</button>)}{recentKeywords.length === 0 && <span>최근 검색어가 없어요.</span>}</div>
               </section>
               <section className="search__section">
                 <div className="section-heading"><h2>지금 많이 찾고 있어요</h2><span>08.06 기준</span></div>

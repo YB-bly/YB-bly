@@ -63,14 +63,9 @@ const AppHeader = ({
             >
               <SearchIcon />
             </Link>
-
-            <button
-              type="button"
-              className="app-header__icon"
-              aria-label="장바구니"
-            >
+            <Link to="/cart" className="app-header__icon" aria-label="장바구니">
               <CartIcon />
-            </button>
+            </Link>
           </>
         )}
       </div>
