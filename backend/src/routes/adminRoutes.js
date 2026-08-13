@@ -9,5 +9,7 @@ router.get('/orders', adminController.listOrders);
 router.patch('/orders/:id/status', adminController.updateOrderStatus);
 router.get('/users', adminController.listUsers);
 router.get('/dashboard', adminController.dashboard);
+router.get('/reviews', adminController.listReviews);
+router.patch('/reviews/:id/hidden', adminController.toggleReviewHidden);
 
 module.exports = router;

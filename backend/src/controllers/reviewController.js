@@ -8,7 +8,7 @@ function listByProduct(req, res) {
     .prepare(
       `SELECT r.id, r.content, r.rating, r.created_at, u.name AS userName
        FROM reviews r JOIN users u ON u.id = r.user_id
-       WHERE r.product_id = ?
+       WHERE r.product_id = ? AND r.hidden = 0
        ORDER BY r.created_at DESC`
     )
     .all(productId);

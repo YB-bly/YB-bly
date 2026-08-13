@@ -4,11 +4,13 @@ const router = express.Router();
 const authRoutes = require('../routes/authRoutes');
 const cartRoutes = require('../routes/cartRoutes');
 const userRoutes = require('../routes/userRoutes');
+const wishlistRoutes = require('../routes/wishlistRoutes');
+const couponRoutes = require('../routes/couponRoutes');
 const productController = require('../controllers/productController');
 const adminController = require('../controllers/adminController');
 const { authMiddleware, adminOnly } = require('../middleware/authMiddleware');
 
-const { vulnAuthMiddleware, vulnAdminOnly } = require('./vulnAuthMiddleware');
+const { vulnAuthMiddleware, attachUserIfPresent, vulnAdminOnly } = require('./vulnAuthMiddleware');
 const { vulnSearch } = require('./vulnProductController');
 const { vulnListByProduct } = require('./vulnReviewController');
 const { vulnCreateOrder, myOrders, vulnOrderDetail } = require('./vulnOrderController');
@@ -18,6 +20,8 @@ const reviewController = require('../controllers/reviewController');
 router.use('/auth', authRoutes);
 router.use('/cart', cartRoutes);
 router.use('/users', userRoutes);
+router.use('/wishlist', wishlistRoutes);
+router.use('/coupons', couponRoutes);
 
 // ---- 상품: 검색만 취약 버전으로 교체 ----
 const productRouter = express.Router();
@@ -30,12 +34,13 @@ productRouter.delete('/:id', authMiddleware, adminOnly, productController.remove
 productRouter.patch('/:id/stock', authMiddleware, adminOnly, productController.updateStock);
 router.use('/products', productRouter);
 
-// ---- 주문: JWT 검증(만료 미검사) + IDOR + 쿠폰 로직 결함 ----
+// ---- 주문 ----
 const orderRouter = express.Router();
-orderRouter.use(vulnAuthMiddleware); // 🚩 만료 클레임 미검사, 약한 시크릿
-orderRouter.post('/', vulnCreateOrder); // 🚩 쿠폰 x 아이템 중복 제출 결함
-orderRouter.get('/', myOrders);
-orderRouter.get('/:id', vulnOrderDetail); // 🚩 IDOR
+// 🚩 주문 생성만 attachUserIfPresent(서명 미검증)를 사용 - GET들은 정상 검증(vulnAuthMiddleware)을 씀
+//    라우트 파일까지 직접 봐야 "왜 이 API만 다른 미들웨어를 쓰지?"가 드러남
+orderRouter.post('/', attachUserIfPresent, vulnCreateOrder); // 🚩 서명 검증 누락 + 쿠폰 로직 결함
+orderRouter.get('/', vulnAuthMiddleware, myOrders);
+orderRouter.get('/:id', vulnAuthMiddleware, vulnOrderDetail); // 🚩 IDOR
 router.use('/orders', orderRouter);
 
 // ---- 리뷰: 목록 조회 시 orderId 노출 (IDOR 발견 경로) ----

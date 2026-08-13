@@ -190,3 +190,42 @@ export const updateAdminProductStock =
 
     return response.data;
   };
+
+/*
+ * 리뷰 관리자 API
+ */
+
+const normalizeAdminReview = (review) => ({
+  ...review,
+
+  id: Number(review.id),
+
+  user: review.userName ?? review.user ?? "사용자",
+
+  product: {
+    name: review.productName ?? review.product?.name ?? "",
+    image: review.productImage ?? review.product?.image ?? "",
+  },
+
+  date: (review.created_at ?? review.date ?? "").slice(0, 10).replaceAll("-", "."),
+
+  status: review.hidden ? "숨김" : "공개",
+
+  reported: Boolean(review.reported),
+
+  verified: Boolean(review.order_id ?? review.orderId),
+});
+
+export const getAdminReviews = async () => {
+  const response = await api.get("/admin/reviews");
+  return response.data.map(normalizeAdminReview);
+};
+
+export const setAdminReviewHidden = async (reviewId, hidden) => {
+  const response = await api.patch(
+    `/admin/reviews/${reviewId}/hidden`,
+    { hidden }
+  );
+
+  return response.data;
+};

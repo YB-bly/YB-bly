@@ -50,7 +50,8 @@ function createOrder(req, res) {
   }
 
   // 총액은 DB에 저장된 가격 기준으로만 계산 (클라이언트가 가격을 보내도 무시함)
-  let totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  let totalPrice = subtotal;
 
   let couponId = null;
   if (couponCode) {
@@ -64,6 +65,13 @@ function createOrder(req, res) {
       .get(userId, coupon.id);
     if (used) {
       return res.status(409).json({ error: '이미 사용한 쿠폰입니다.' });
+    }
+
+    // 최소 주문 금액 조건 (예: ONCE20은 10만원 이상 구매 시에만 적용 가능)
+    if (coupon.min_order_amount && subtotal < coupon.min_order_amount) {
+      return res.status(400).json({
+        error: `${coupon.min_order_amount.toLocaleString('ko-KR')}원 이상 구매 시 사용할 수 있는 쿠폰입니다.`,
+      });
     }
 
     couponId = coupon.id;
@@ -150,4 +158,3 @@ function orderDetail(req, res) {
 }
 
 module.exports = { createOrder, myOrders, orderDetail, generateOrderNumber };
-

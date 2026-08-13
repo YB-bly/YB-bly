@@ -14,7 +14,7 @@ app.use(cookieParser());
 const VULN_MODE = process.env.VULN_MODE === 'true';
 
 if (VULN_MODE) {
-  console.log('VULN_MODE=true : 의도한 취약점이 포함된 버전으로 실행됩니다. (모의해킹 배포용)');
+  console.log('⚠️  VULN_MODE=true : 의도한 취약점이 포함된 버전으로 실행됩니다. (모의해킹 배포용)');
   app.use('/api', require('./vulnerabilities/vulnRoutes'));
 } else {
   app.use('/api/auth', require('./routes/authRoutes'));
@@ -22,13 +22,14 @@ if (VULN_MODE) {
   app.use('/api/cart', require('./routes/cartRoutes'));
   app.use('/api/orders', require('./routes/orderRoutes'));
   app.use('/api/reviews', require('./routes/reviewRoutes'));
+  app.use('/api/coupons', require('./routes/couponRoutes'));
   app.use('/api/users', require('./routes/userRoutes'));
   app.use('/api/wishlist', require('./routes/wishlistRoutes'));
   app.use('/api/admin', require('./routes/adminRoutes'));
 }
 
 app.get('/', (req, res) => {
-  res.json({ message: '백엔드 서버 정상 동작 중...', vulnMode: VULN_MODE });
+  res.json({ message: '쇼핑몰 백엔드 서버가 정상 동작 중입니다.', vulnMode: VULN_MODE });
 });
 
 const PORT = process.env.PORT || 3000;

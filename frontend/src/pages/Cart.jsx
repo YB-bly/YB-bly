@@ -17,14 +17,14 @@ import {
 } from "../data/shopStorage";
 
 import {
-  getCoupons,
-} from "../data/shopRepository";
-
-import {
   getCartItems,
   updateCartItem,
   removeCartItem,
 } from "../api/cartApi";
+
+import {
+  getMyCoupons,
+} from "../api/couponApi";
 
 const Cart = () => {
   const [items, setItems] =
@@ -36,7 +36,8 @@ const Cart = () => {
   const [error, setError] =
     useState("");
 
-  const coupons = getCoupons();
+  const [coupons, setCoupons] =
+    useState([]);
 
   const [couponId, setCouponId] =
     useState("");
@@ -55,10 +56,14 @@ const Cart = () => {
         setLoading(true);
         setError("");
 
-        const data =
-          await getCartItems();
+        const [data, couponData] =
+          await Promise.all([
+            getCartItems(),
+            getMyCoupons(),
+          ]);
 
         setItems(data);
+        setCoupons(couponData);
       } catch (error) {
         console.error(
           "장바구니 조회 실패:",
@@ -212,8 +217,7 @@ const Cart = () => {
     const found = coupons.find(
       (item) =>
         Number(item.id) ===
-          Number(couponId) &&
-        item.status === "available"
+        Number(couponId)
     );
 
     if (!found) {
@@ -221,6 +225,21 @@ const Cart = () => {
 
       setCouponMessage(
         "사용할 수 없는 쿠폰이에요."
+      );
+
+      return;
+    }
+
+    if (
+      found.minAmount &&
+      subtotal < found.minAmount
+    ) {
+      setCoupon(null);
+
+      setCouponMessage(
+        `${found.minAmount.toLocaleString(
+          "ko-KR"
+        )}원 이상 구매 시 사용할 수 있는 쿠폰이에요.`
       );
 
       return;
@@ -489,19 +508,16 @@ const Cart = () => {
                           value={
                             item.id
                           }
-                          disabled={
-                            item.status !==
-                            "available"
-                          }
                           key={
                             item.id
                           }
                         >
                           {item.label}{" "}
                           ({item.code})
-                          {item.status ===
-                          "used"
-                            ? " · 사용 완료"
+                          {item.minAmount
+                            ? ` · ${item.minAmount.toLocaleString(
+                                "ko-KR"
+                              )}원 이상`
                             : ` · ${item.expiresAt}까지`}
                         </option>
                       )

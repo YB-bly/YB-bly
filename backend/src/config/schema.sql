@@ -39,7 +39,10 @@ CREATE TABLE IF NOT EXISTS cart_items (
 CREATE TABLE IF NOT EXISTS coupons (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   code TEXT NOT NULL UNIQUE,
-  discount_percent INTEGER NOT NULL
+  label TEXT NOT NULL DEFAULT '',
+  discount_percent INTEGER NOT NULL,
+  min_order_amount INTEGER NOT NULL DEFAULT 0,  -- 이 금액 이상 구매해야 사용 가능 (0이면 제한 없음)
+  expires_at TEXT
 );
 
 CREATE TABLE IF NOT EXISTS coupon_usage (
@@ -86,6 +89,8 @@ CREATE TABLE IF NOT EXISTS reviews (
   order_id INTEGER,             -- "구매 인증" 리뷰용 (실제 주문에서만 리뷰 작성 가능)
   content TEXT NOT NULL,
   rating INTEGER NOT NULL DEFAULT 5,
+  hidden INTEGER NOT NULL DEFAULT 0,    -- 관리자가 숨김 처리했는지 (1이면 일반 조회에서 제외)
+  reported INTEGER NOT NULL DEFAULT 0,  -- 신고 접수 여부
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id),
   FOREIGN KEY (product_id) REFERENCES products(id),

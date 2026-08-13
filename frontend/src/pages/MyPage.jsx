@@ -22,6 +22,14 @@ import {
   getOrders,
 } from "../api/orderApi";
 
+import {
+  getWishlist,
+} from "../api/wishlistApi";
+
+import {
+  getMyCoupons,
+} from "../api/couponApi";
+
 const MyPage = () => {
   const navigate = useNavigate();
 
@@ -30,6 +38,12 @@ const MyPage = () => {
 
   const [orders, setOrders] =
     useState([]);
+
+  const [wishlistCount, setWishlistCount] =
+    useState(0);
+
+  const [couponCount, setCouponCount] =
+    useState(0);
 
   const [loading, setLoading] =
     useState(true);
@@ -46,13 +60,19 @@ const MyPage = () => {
         const [
           profileData,
           ordersData,
+          wishlistData,
+          couponsData,
         ] = await Promise.all([
           getMyProfile(),
           getOrders(),
+          getWishlist(),
+          getMyCoupons(),
         ]);
 
         setProfile(profileData);
         setOrders(ordersData);
+        setWishlistCount(wishlistData.length);
+        setCouponCount(couponsData.length);
       } catch (error) {
         console.error(
           "마이페이지 조회 실패:",
@@ -199,7 +219,7 @@ const MyPage = () => {
                   </span>
 
                   <strong>
-                    3장
+                    {couponCount}장
                   </strong>
                 </div>
 
@@ -209,7 +229,7 @@ const MyPage = () => {
                   </span>
 
                   <strong>
-                    2,400P
+                    0P
                   </strong>
                 </div>
 
@@ -219,7 +239,7 @@ const MyPage = () => {
                   </span>
 
                   <strong>
-                    12개
+                    {wishlistCount}개
                   </strong>
                 </div>
               </section>
