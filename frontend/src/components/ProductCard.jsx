@@ -20,11 +20,17 @@ const ProductCard = ({
           className="product-card__image-link"
           to={`/products/${product.id}`}
         >
-          <img
-            className="product-card__image"
-            src={product.image}
-            alt={product.name}
-          />
+          {product.image ? (
+            <img
+              className="product-card__image"
+              src={product.image}
+              alt={product.name}
+            />
+          ) : (
+            <div className="product-card__image product-card__image--empty">
+              이미지 준비 중
+            </div>
+          )}
 
           {product.badge && (
             <span className="product-card__badge">
@@ -36,7 +42,9 @@ const ProductCard = ({
         <button
           type="button"
           className={`product-card__like${
-            liked ? " product-card__like--active" : ""
+            liked
+              ? " product-card__like--active"
+              : ""
           }`}
           aria-label={
             liked
@@ -64,17 +72,45 @@ const ProductCard = ({
           </p>
 
           <p className="product-card__price">
-            <span>{product.discount}%</span>
-            <strong>{formatPrice(product.price)}</strong>
+            {Number(product.discount) >
+              0 && (
+              <span>
+                {product.discount}%
+              </span>
+            )}
+
+            <strong>
+              {formatPrice(
+                product.price
+              )}
+            </strong>
           </p>
 
           <div className="product-card__tags">
-            {(product.tags?.length ? product.tags : ["무료배송"]).slice(0, 2).map((tag) => <span key={tag}>{tag}</span>)}
+            {(
+              product.tags?.length
+                ? product.tags
+                : ["무료배송"]
+            )
+              .slice(0, 2)
+              .map((tag) => (
+                <span key={tag}>
+                  {tag}
+                </span>
+              ))}
           </div>
 
           <p className="product-card__rating">
-            ★ {product.rating}
-            <span>({product.reviews})</span>
+            ★{" "}
+            {Number(
+              product.rating ?? 0
+            ).toFixed(1)}
+            <span>
+              (
+              {product.reviews ??
+                0}
+              )
+            </span>
           </p>
         </div>
       </Link>
