@@ -8,7 +8,15 @@ require('./config/db'); // 최초 실행 시 SQLite 파일 + 테이블 자동 �
 const app = express();
 
 app.use(cors({ origin: 'http://localhost:5173', credentials: true })); // 프론트(Vite) 주소, 쿠키 인증이라 credentials 필요
-app.use(express.json());
+app.use(express.json(
+  {
+
+    limit: "2mb",
+  }
+));
+app.use(
+  express.urlencoded({ extended: true, limit: "2mb" })
+);
 app.use(cookieParser());
 
 const VULN_MODE = process.env.VULN_MODE === 'true';
