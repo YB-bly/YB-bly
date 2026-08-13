@@ -1,6 +1,12 @@
-import { useState } from "react";
+import {
+  useState,
+} from "react";
+
 import { Link } from "../router";
-import { useNavigate } from "../router-hooks";
+
+import {
+  useNavigate,
+} from "../router-hooks";
 
 import AppHeader from "../components/AppHeader";
 import FormField from "../components/FormField";
@@ -15,37 +21,55 @@ const Login = ({
   redirectTo,
   adminMode = false,
 }) => {
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
-  const [error, setError] = useState("");
-  const [loading, setLoading] =
-    useState(false);
+  const [
+    error,
+    setError,
+  ] = useState("");
 
-  const [forgotOpen, setForgotOpen] =
-    useState(false);
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
+
+  const [
+    forgotOpen,
+    setForgotOpen,
+  ] = useState(false);
 
   const [
     resetMessage,
     setResetMessage,
   ] = useState("");
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (
+    event
+  ) => {
     event.preventDefault();
 
-    const form = new FormData(
-      event.currentTarget
-    );
+    const form =
+      new FormData(
+        event.currentTarget
+      );
 
     const email =
-      form.get("email")?.trim();
+      form
+        .get("email")
+        ?.trim();
 
     const password =
       form.get("password");
 
-    if (!email || !password) {
+    if (
+      !email ||
+      !password
+    ) {
       setError(
         "이메일과 비밀번호를 모두 입력해 주세요."
       );
+
       return;
     }
 
@@ -53,27 +77,28 @@ const Login = ({
       setLoading(true);
       setError("");
 
-      const data = await login(
-        email,
-        password
-      );
+      const data =
+        await login(
+          email,
+          password
+        );
+
+      const role =
+        data?.user?.role;
 
       /*
-       * 관리자 로그인 화면에서
-       * 일반 사용자 계정으로 로그인한 경우
+       * /admin에서 표시된 관리자 로그인 화면에
+       * 일반 사용자 계정을 입력한 경우
        */
       if (
         adminMode &&
-        data?.user?.role !== "admin"
+        role !== "admin"
       ) {
-        /*
-         * 로그인 자체는 성공했기 때문에
-         * httpOnly 쿠키가 생성됐을 수 있음.
-         * 따라서 즉시 로그아웃 처리.
-         */
         try {
           await logout();
-        } catch (logoutError) {
+        } catch (
+          logoutError
+        ) {
           console.error(
             "관리자 권한 확인 후 로그아웃 실패:",
             logoutError
@@ -88,15 +113,33 @@ const Login = ({
       }
 
       /*
-       * httpOnly 쿠키 인증이므로
-       * localStorage에 토큰을 저장하지 않음.
+       * 관리자 계정이면
+       * 일반 /login에서 로그인했더라도
+       * 관리자 대시보드로 이동
        */
+      if (
+        role === "admin"
+      ) {
+        navigate(
+          "/admin",
+          {
+            replace: true,
+          }
+        );
 
+        return;
+      }
+
+      /*
+       * 일반 사용자
+       */
       navigate(
-        redirectTo ||
-          (adminMode
-            ? "/admin"
-            : "/mypage"),
+        redirectTo &&
+          !redirectTo.startsWith(
+            "/admin"
+          )
+          ? redirectTo
+          : "/mypage",
         {
           replace: true,
         }
@@ -108,7 +151,8 @@ const Login = ({
       );
 
       setError(
-        error.response?.data?.error ||
+        error.response?.data
+          ?.error ||
           "로그인 중 오류가 발생했습니다."
       );
     } finally {
@@ -116,12 +160,15 @@ const Login = ({
     }
   };
 
-  const requestReset = (event) => {
+  const requestReset = (
+    event
+  ) => {
     event.preventDefault();
 
-    const form = new FormData(
-      event.currentTarget
-    );
+    const form =
+      new FormData(
+        event.currentTarget
+      );
 
     const email =
       form
@@ -132,22 +179,20 @@ const Login = ({
       return;
     }
 
-    /*
-     * 현재 백엔드에 비밀번호 재설정 API가
-     * 없으므로 모의 기능으로 유지
-     */
     setResetMessage(
       "입력한 이메일이 등록되어 있다면 재설정 안내가 발송됩니다. (모의 전송)"
     );
   };
 
-  const toggleForgotPassword = () => {
-    setForgotOpen(
-      (current) => !current
-    );
+  const toggleForgotPassword =
+    () => {
+      setForgotOpen(
+        (current) =>
+          !current
+      );
 
-    setResetMessage("");
-  };
+      setResetMessage("");
+    };
 
   return (
     <div className="login-page">
@@ -191,7 +236,9 @@ const Login = ({
 
           <form
             className="auth-form"
-            onSubmit={handleSubmit}
+            onSubmit={
+              handleSubmit
+            }
             noValidate
           >
             <FormField
@@ -264,7 +311,9 @@ const Login = ({
               </p>
 
               <form
-                onSubmit={requestReset}
+                onSubmit={
+                  requestReset
+                }
               >
                 <input
                   required
@@ -289,7 +338,9 @@ const Login = ({
 
           {!adminMode && (
             <p className="auth-footer">
-              아직 회원이 아니신가요?{" "}
+              아직 회원이
+              아니신가요?{" "}
+
               <Link to="/signup">
                 회원가입
               </Link>
@@ -297,9 +348,10 @@ const Login = ({
           )}
         </main>
 
-        {redirectTo && (
-          <BottomNavigation />
-        )}
+        {redirectTo &&
+          !adminMode && (
+            <BottomNavigation />
+          )}
       </div>
     </div>
   );
