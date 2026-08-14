@@ -13,9 +13,11 @@
 ## 2 JWT 인증 우회
 - **파일**: `vulnAuthMiddleware.js`
 - **결함**:
-  - `JWT_SECRET`이 `.env`에 없으면 예측 가능한 기본값(`ybbly_default_secret`)으로 동작
-  - `jwt.verify()`에 `{ ignoreExpiration: true }`가 걸려 있어 **서명은 확인하지만 만료 시간은 검사하지 않음**
-  - 관리자 대시보드(`/api/admin/dashboard`)는 `vulnAuthMiddleware`만 걸려 있고 `adminOnly`(역할 검사)가 빠져 있음
+  - 신규 관리자 주문 통계 API(`/api/admin/order-statistics`)만 `jwt.decode()`로 payload를 해석함
+  - `exp`와 `role === 'ADMIN'`은 확인하지만 **서명, 허용 알고리즘, `iss`, `aud`를 검증하지 않음**
+  - 일반 사용자가 자신의 JWT payload에서 `role`을 `USER`에서 `ADMIN`으로 바꾼 토큰을 사용할 수 있음
+  - `/api/admin/orders` 등 기존 관리자 API는 정상 `authMiddleware`를 사용하므로 같은 변조 토큰을 거부함
+- **발견 경로**: `/login` 로그인 → `/mypage`의 Local Storage/Network에서 토큰 확인 → 관리자 프런트엔드 코드에서 통계 API 확인
 - **관련 OWASP**: A07 - Identification and Authentication Failures
 
 ## 3 SQL Injection — 상품 검색

@@ -9,9 +9,19 @@ const MAX_FAILED_LOGIN = 5; // SR-02
 
 function issueTokenCookie(res, user) {
   const token = jwt.sign(
-    { id: user.id, role: user.role },
+    {
+      sub: String(user.id),
+      id: user.id,
+      email: user.email,
+      role: user.role.toUpperCase(),
+    },
     process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '30m' }
+    {
+      algorithm: 'HS256',
+      expiresIn: process.env.JWT_EXPIRES_IN || '30m',
+      issuer: 'shopping-auth',
+      audience: 'shopping-api',
+    }
   );
 
   // SR-05: HttpOnly, Secure, SameSite 적용
@@ -78,9 +88,19 @@ async function login(req, res) {
     // 로그인 성공 시 실패 횟수 초기화
     db.prepare('UPDATE users SET failed_login_count = 0 WHERE id = ?').run(user.id);
 
-    issueTokenCookie(res, user);
+    const accessToken = issueTokenCookie(res, user);
 
-    res.json({ user: { id: user.id, email: user.email, name: user.name, role: user.role } });
+    const response = {
+      user: { id: user.id, email: user.email, name: user.name, role: user.role },
+    };
+
+    // 교육용 취약 모드에서만 브라우저 개발자 도구로 JWT를 확인할 수 있게 한다.
+    // 정상 모드에서는 httpOnly 쿠키만 사용하므로 토큰을 JavaScript에 노출하지 않는다.
+    if (process.env.VULN_MODE === 'true') {
+      response.access_token = accessToken;
+    }
+
+    res.json(response);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: '서버 오류가 발생했습니다.' });

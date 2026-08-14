@@ -10,7 +10,7 @@ const productController = require('../controllers/productController');
 const adminController = require('../controllers/adminController');
 const { authMiddleware, adminOnly } = require('../middleware/authMiddleware');
 
-const { vulnAuthMiddleware, attachUserIfPresent, vulnAdminOnly } = require('./vulnAuthMiddleware');
+const { unsignedAdminStatisticsOnly } = require('./vulnAuthMiddleware');
 const { vulnSearch } = require('./vulnProductController');
 const { vulnListByProduct } = require('./vulnReviewController');
 const { vulnCreateOrder, myOrders, vulnOrderDetail } = require('./vulnOrderController');
@@ -36,11 +36,9 @@ router.use('/products', productRouter);
 
 // ---- 주문 ----
 const orderRouter = express.Router();
-// 🚩 주문 생성만 attachUserIfPresent(서명 미검증)를 사용 - GET들은 정상 검증(vulnAuthMiddleware)을 씀
-//    라우트 파일까지 직접 봐야 "왜 이 API만 다른 미들웨어를 쓰지?"가 드러남
-orderRouter.post('/', attachUserIfPresent, vulnCreateOrder); // 🚩 서명 검증 누락 + 쿠폰 로직 결함
-orderRouter.get('/', vulnAuthMiddleware, myOrders);
-orderRouter.get('/:id', vulnAuthMiddleware, vulnOrderDetail); // 🚩 IDOR
+orderRouter.post('/', authMiddleware, vulnCreateOrder); // 🚩 쿠폰 로직 결함
+orderRouter.get('/', authMiddleware, myOrders);
+orderRouter.get('/:id', authMiddleware, vulnOrderDetail); // 🚩 IDOR
 router.use('/orders', orderRouter);
 
 // ---- 리뷰: 목록 조회 시 orderId 노출 (IDOR 발견 경로) ----
@@ -50,12 +48,17 @@ reviewRouter.post('/', authMiddleware, reviewController.create);
 reviewRouter.delete('/:id', authMiddleware, reviewController.remove);
 router.use('/reviews', reviewRouter);
 
-// ---- 관리자: 대시보드만 권한 검사 누락 ----
+// ---- 관리자: 주문 통계 API만 JWT 서명 검증 누락 ----
 const adminRouter = express.Router();
 adminRouter.get('/orders', authMiddleware, adminOnly, adminController.listOrders);
 adminRouter.patch('/orders/:id/status', authMiddleware, adminOnly, adminController.updateOrderStatus);
 adminRouter.get('/users', authMiddleware, adminOnly, adminController.listUsers);
-adminRouter.get('/dashboard', vulnAuthMiddleware, adminController.dashboard); // 🚩 adminOnly 없음
+adminRouter.get('/dashboard', authMiddleware, adminOnly, adminController.dashboard);
+adminRouter.get(
+  '/order-statistics',
+  unsignedAdminStatisticsOnly, // 🚩 payload만 신뢰하고 서명/iss/aud 미검증
+  adminController.orderStatistics
+);
 router.use('/admin', adminRouter);
 
 module.exports = router;

@@ -52,7 +52,7 @@ function remove(req, res) {
   if (!review) return res.status(404).json({ error: '리뷰를 찾을 수 없습니다.' });
 
   // 본인 리뷰이거나 관리자만 삭제 가능
-  if (review.user_id !== req.user.id && req.user.role !== 'admin') {
+  if (review.user_id !== req.user.id && req.user.role !== 'ADMIN') {
     return res.status(403).json({ error: '삭제 권한이 없습니다.' });
   }
 

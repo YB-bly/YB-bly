@@ -20,9 +20,10 @@ export const getAdminStatusLabel = (
 
 export const getAdminDashboard =
   async () => {
-    const response = await api.get(
-      "/admin/dashboard"
-    );
+    const [response, statistics] = await Promise.all([
+      api.get("/admin/dashboard"),
+      getAdminOrderStatistics(),
+    ]);
 
     return {
       userCount: Number(
@@ -34,14 +35,19 @@ export const getAdminDashboard =
       ),
 
       orderCount: Number(
-        response.data.orderCount ?? 0
+        statistics.summary?.totalOrders ?? 0
       ),
 
       salesTotal: Number(
-        response.data.salesTotal ?? 0
+        statistics.summary?.totalSales ?? 0
       ),
     };
   };
+
+export const getAdminOrderStatistics = async (params = {}) => {
+  const response = await api.get("/admin/order-statistics", { params });
+  return response.data;
+};
 
 export const getAdminOrders =
   async () => {

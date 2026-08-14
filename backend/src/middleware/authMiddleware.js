@@ -10,8 +10,16 @@ function blacklistToken(token) {
   blacklistedTokens.add(token);
 }
 
+function getRequestToken(req) {
+  const authorization = req.get('authorization');
+  if (authorization?.startsWith('Bearer ')) {
+    return authorization.slice('Bearer '.length).trim();
+  }
+  return req.cookies.token;
+}
+
 function authMiddleware(req, res, next) {
-  const token = req.cookies.token;
+  const token = getRequestToken(req);
 
   if (!token) {
     return res.status(401).json({ error: '로그인이 필요합니다.' });
@@ -23,7 +31,11 @@ function authMiddleware(req, res, next) {
 
   try {
     // 서명 + 만료시간(exp)까지 모두 검증 (정상 버전)
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET, {
+      algorithms: ['HS256'],
+      issuer: 'shopping-auth',
+      audience: 'shopping-api',
+    });
     req.user = decoded; // { id, role }
     req.token = token;
     next();
@@ -33,10 +45,10 @@ function authMiddleware(req, res, next) {
 }
 
 function adminOnly(req, res, next) {
-  if (req.user.role !== 'admin') {
+  if (req.user.role !== 'ADMIN') {
     return res.status(403).json({ error: '관리자만 접근할 수 있습니다.' });
   }
   next();
 }
 
-module.exports = { authMiddleware, adminOnly, blacklistToken };
+module.exports = { authMiddleware, adminOnly, blacklistToken, getRequestToken };

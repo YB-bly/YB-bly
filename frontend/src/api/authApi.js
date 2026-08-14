@@ -6,6 +6,12 @@ export const login = async (email, password) => {
     password,
   });
 
+  if (response.data.access_token) {
+    localStorage.setItem("access_token", response.data.access_token);
+  } else {
+    localStorage.removeItem("access_token");
+  }
+
   return response.data;
 };
 
@@ -24,7 +30,12 @@ export const register = async ({
 };
 
 export const logout = async () => {
-  const response = await api.post("/auth/logout");
-
-  return response.data;
+  try {
+    const response = await api.post("/auth/logout", null, {
+      skipAccessToken: true,
+    });
+    return response.data;
+  } finally {
+    localStorage.removeItem("access_token");
+  }
 };

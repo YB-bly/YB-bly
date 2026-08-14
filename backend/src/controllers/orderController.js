@@ -144,7 +144,7 @@ function orderDetail(req, res) {
   if (!order) return res.status(404).json({ error: '주문을 찾을 수 없습니다.' });
 
   // 본인 주문이 아니면 관리자가 아닌 이상 접근 불가
-  if (order.user_id !== req.user.id && req.user.role !== 'admin') {
+  if (order.user_id !== req.user.id && req.user.role !== 'ADMIN') {
     return res.status(403).json({ error: '접근 권한이 없습니다.' });
   }
 
