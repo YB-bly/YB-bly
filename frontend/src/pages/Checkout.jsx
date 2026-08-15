@@ -91,19 +91,38 @@ const Checkout = () => {
       setError("");
 
       const result =
-        await createOrder({
-          couponCode:
-            checkout.coupon?.code ||
-            null,
+  await createOrder({
+    couponCode:
+      checkout.coupon?.code ||
+      null,
 
-          idempotencyKey,
+    idempotencyKey,
 
-          recipientName,
+    recipientName,
 
-          recipientPhone,
+    recipientPhone,
 
-          address,
-        });
+    address,
+
+    items:
+      checkout.items.map(
+        (item) => ({
+          productId:
+            item.product.id,
+
+          quantity:
+            item.quantity,
+
+          optionLabel:
+            item.option ||
+            "FREE",
+        })
+      ),
+
+    orderType:
+      checkout.type ||
+      "cart",
+  });
 
       /*
        * 서버에서 주문 생성 후
