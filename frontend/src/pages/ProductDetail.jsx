@@ -132,7 +132,7 @@ const ProductDetail = () => {
               )
             );
           } catch (
-            wishlistError
+          wishlistError
           ) {
             if (
               wishlistError
@@ -156,7 +156,7 @@ const ProductDetail = () => {
           setError(
             error.response?.data
               ?.error ||
-              "상품 정보를 불러오지 못했습니다."
+            "상품 정보를 불러오지 못했습니다."
           );
         } finally {
           setLoading(false);
@@ -246,7 +246,7 @@ const ProductDetail = () => {
         alert(
           error.response?.data
             ?.error ||
-            "찜 처리 중 오류가 발생했습니다."
+          "찜 처리 중 오류가 발생했습니다."
         );
       } finally {
         setLikeLoading(false);
@@ -284,20 +284,24 @@ const ProductDetail = () => {
         alert(
           error.response?.data
             ?.error ||
-            "장바구니에 담지 못했습니다."
+          "장바구니에 담지 못했습니다."
         );
       }
     };
 
   const buyNow = () => {
-    saveCheckout({
+    const directCheckout = {
+      type: "direct",
+      orderType: "direct",
+
       items: [
         {
           id: `${product.id}-${size}`,
 
           product,
 
-          option: size,
+          option:
+            size || "FREE",
 
           quantity,
         },
@@ -314,11 +318,14 @@ const ProductDetail = () => {
       total:
         product.price *
         quantity,
-    });
+    };
+
+    saveCheckout(
+      directCheckout
+    );
 
     navigate("/checkout");
   };
-
   const formatReviewDate = (
     value
   ) => {
@@ -472,23 +479,23 @@ const ProductDetail = () => {
 
             {product.originalPrice >
               product.price && (
-              <del>
-                {formatPrice(
-                  product.originalPrice
-                )}
-              </del>
-            )}
+                <del>
+                  {formatPrice(
+                    product.originalPrice
+                  )}
+                </del>
+              )}
 
             <p className="product-detail__price">
               {product.discount >
                 0 && (
-                <span>
-                  {
-                    product.discount
-                  }
-                  %
-                </span>
-              )}
+                  <span>
+                    {
+                      product.discount
+                    }
+                    %
+                  </span>
+                )}
 
               {formatPrice(
                 product.price
@@ -575,7 +582,7 @@ const ProductDetail = () => {
                         Math.max(
                           1,
                           value -
-                            1
+                          1
                         )
                     )
                   }
@@ -603,7 +610,7 @@ const ProductDetail = () => {
                             product.stock
                           ),
                           value +
-                            1
+                          1
                         )
                     )
                   }
@@ -672,9 +679,9 @@ const ProductDetail = () => {
                           Math.max(
                             0,
                             5 -
-                              Number(
-                                review.rating
-                              )
+                            Number(
+                              review.rating
+                            )
                           )
                         )}
                       </span>
@@ -709,11 +716,10 @@ const ProductDetail = () => {
 
         <div className="purchase-bar">
           <button
-            className={`purchase-bar__like${
-              liked
-                ? " is-liked"
-                : ""
-            }`}
+            className={`purchase-bar__like${liked
+              ? " is-liked"
+              : ""
+              }`}
             type="button"
             disabled={
               likeLoading
@@ -768,9 +774,9 @@ const ProductDetail = () => {
               ? "구매 불가"
               : size
                 ? `${formatPrice(
-                    product.price *
-                      quantity
-                  )} 구매`
+                  product.price *
+                  quantity
+                )} 구매`
                 : "바로 구매"}
           </button>
         </div>

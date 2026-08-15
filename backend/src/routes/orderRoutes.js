@@ -1,12 +1,32 @@
 const express = require('express');
+
 const router = express.Router();
+
 const orderController = require('../controllers/orderController');
-const { authMiddleware } = require('../middleware/authMiddleware');
+const {
+  authMiddleware,
+} = require('../middleware/authMiddleware');
 
 router.use(authMiddleware);
 
-router.post('/', orderController.createOrder);
-router.get('/', orderController.myOrders);
-router.get('/:id', orderController.orderDetail);
+router.post(
+  '/',
+  orderController.createOrder
+);
+
+router.get(
+  '/',
+  orderController.myOrders
+);
+
+router.get(
+  '/:id/receipt',
+  orderController.orderReceipt
+);
+
+router.get(
+  '/:id',
+  orderController.orderDetail
+);
 
 module.exports = router;

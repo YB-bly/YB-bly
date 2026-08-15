@@ -1,160 +1,728 @@
 const db = require('../config/db');
 
-// "20260806-00001" 형식의 사람이 읽는 주문번호 생성 (당일 순번 기준)
 function generateOrderNumber() {
   const now = new Date();
-  const datePart = now.toISOString().slice(0, 10).replace(/-/g, '');
+  const datePart = now
+    .toISOString()
+    .slice(0, 10)
+    .replace(/-/g, '');
+
   const todayCount = db
-    .prepare(`SELECT COUNT(*) AS count FROM orders WHERE order_number LIKE ?`)
+    .prepare(
+      `SELECT COUNT(*) AS count
+       FROM orders
+       WHERE order_number LIKE ?`
+    )
     .get(`${datePart}-%`).count;
-  const seq = String(todayCount + 1).padStart(5, '0');
+
+  const seq = String(
+    todayCount + 1
+  ).padStart(5, '0');
+
   return `${datePart}-${seq}`;
 }
 
-// 주문 생성 (장바구니 → 주문 전환, 모의 결제까지 한 번에 처리)
-// SR-09: 가격은 서버가 DB에서 다시 조회해서 계산 (클라이언트 값 신뢰하지 않음)
-// SR-10: idempotencyKey로 중복 주문 방지
 function createOrder(req, res) {
-  const { couponCode, idempotencyKey, recipientName, recipientPhone, address } = req.body;
+  const {
+    couponCode,
+    idempotencyKey,
+    recipientName,
+    recipientPhone,
+    address,
+    items,
+    orderType,
+  } = req.body;
+
   const userId = req.user.id;
 
   if (!idempotencyKey) {
-    return res.status(400).json({ error: 'idempotencyKey가 필요합니다.' });
-  }
-  if (!recipientName || !recipientPhone || !address) {
-    return res.status(400).json({ error: '배송지 정보(수령인, 연락처, 주소)를 입력해주세요.' });
-  }
-
-  const already = db.prepare('SELECT id FROM orders WHERE idempotency_key = ?').get(idempotencyKey);
-  if (already) {
-    return res.status(200).json({ orderId: already.id, message: '이미 처리된 주문입니다.' });
+    return res.status(400).json({
+      error:
+        'idempotencyKey가 필요합니다.',
+    });
   }
 
-  const cartItems = db
+  if (
+    !recipientName ||
+    !recipientPhone ||
+    !address
+  ) {
+    return res.status(400).json({
+      error:
+        '배송지 정보(수령인, 연락처, 주소)를 입력해주세요.',
+    });
+  }
+
+  /*
+   * 동일한 결제 요청의
+   * 중복 주문 생성 방지
+   */
+  const already = db
     .prepare(
-      `SELECT c.product_id, c.option_label, c.quantity, p.price, p.stock, p.name
-       FROM cart_items c JOIN products p ON p.id = c.product_id
-       WHERE c.user_id = ?`
+      `SELECT id
+       FROM orders
+       WHERE idempotency_key = ?`
     )
-    .all(userId);
+    .get(idempotencyKey);
 
-  if (cartItems.length === 0) {
-    return res.status(400).json({ error: '장바구니가 비어있습니다.' });
+  if (already) {
+    return res.status(200).json({
+      orderId: already.id,
+      message:
+        '이미 처리된 주문입니다.',
+    });
   }
 
-  // 재고 확인 (서버 기준)
-  for (const item of cartItems) {
-    if (item.quantity > item.stock) {
-      return res.status(409).json({ error: `${item.name}의 재고가 부족합니다.` });
+  /*
+   * ============================
+   * 주문 상품 결정
+   * ============================
+   *
+   * direct:
+   * 상품 상세에서 바로 구매
+   *
+   * cart:
+   * 기존 장바구니 주문
+   */
+  const isDirectOrder =
+    orderType === 'direct' &&
+    Array.isArray(items) &&
+    items.length > 0;
+
+  let orderItems = [];
+
+  /*
+   * 바로 구매
+   */
+  if (isDirectOrder) {
+    const getProductStmt =
+      db.prepare(
+        `SELECT
+          id AS product_id,
+          price,
+          stock,
+          name
+         FROM products
+         WHERE id = ?`
+      );
+
+    for (
+      const requestedItem of items
+    ) {
+      const productId = Number(
+        requestedItem.productId ??
+          requestedItem.product_id
+      );
+
+      const quantity = Number(
+        requestedItem.quantity ?? 1
+      );
+
+      const optionLabel =
+        requestedItem.optionLabel ??
+        requestedItem.option_label ??
+        'FREE';
+
+      if (
+        !Number.isInteger(productId) ||
+        productId <= 0
+      ) {
+        return res
+          .status(400)
+          .json({
+            error:
+              '올바르지 않은 상품 정보입니다.',
+          });
+      }
+
+      if (
+        !Number.isInteger(quantity) ||
+        quantity <= 0
+      ) {
+        return res
+          .status(400)
+          .json({
+            error:
+              '올바르지 않은 주문 수량입니다.',
+          });
+      }
+
+      /*
+       * 상품 가격과 재고는
+       * 프론트에서 받은 값을 사용하지 않고
+       * DB에서 다시 조회한다.
+       */
+      const product =
+        getProductStmt.get(
+          productId
+        );
+
+      if (!product) {
+        return res
+          .status(404)
+          .json({
+            error:
+              '주문하려는 상품을 찾을 수 없습니다.',
+          });
+      }
+
+      orderItems.push({
+        product_id:
+          product.product_id,
+
+        option_label:
+          optionLabel,
+
+        quantity,
+
+        price:
+          Number(
+            product.price
+          ),
+
+        stock:
+          Number(
+            product.stock
+          ),
+
+        name:
+          product.name,
+      });
+    }
+  } else {
+    /*
+     * 기존 장바구니 주문
+     */
+    orderItems = db
+      .prepare(
+        `SELECT
+          c.product_id,
+          c.option_label,
+          c.quantity,
+          p.price,
+          p.stock,
+          p.name
+         FROM cart_items c
+         JOIN products p
+           ON p.id = c.product_id
+         WHERE c.user_id = ?`
+      )
+      .all(userId);
+
+    if (
+      orderItems.length === 0
+    ) {
+      return res
+        .status(400)
+        .json({
+          error:
+            '장바구니가 비어있습니다.',
+        });
     }
   }
 
-  // 총액은 DB에 저장된 가격 기준으로만 계산 (클라이언트가 가격을 보내도 무시함)
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  let totalPrice = subtotal;
+  /*
+   * ============================
+   * 재고 확인
+   * ============================
+   */
+  for (
+    const item of orderItems
+  ) {
+    if (
+      item.quantity >
+      item.stock
+    ) {
+      return res
+        .status(409)
+        .json({
+          error:
+            `${item.name}의 재고가 부족합니다.`,
+        });
+    }
+  }
 
+  /*
+   * ============================
+   * 주문 금액 계산
+   * ============================
+   */
+  const subtotal =
+    orderItems.reduce(
+      (sum, item) =>
+        sum +
+        item.price *
+          item.quantity,
+      0
+    );
+
+  let totalPrice = subtotal;
   let couponId = null;
+
+  /*
+   * ============================
+   * 쿠폰 처리
+   * ============================
+   */
   if (couponCode) {
-    const coupon = db.prepare('SELECT * FROM coupons WHERE code = ?').get(couponCode);
+    const coupon = db
+      .prepare(
+        `SELECT *
+         FROM coupons
+         WHERE code = ?`
+      )
+      .get(couponCode);
+
     if (!coupon) {
-      return res.status(400).json({ error: '유효하지 않은 쿠폰입니다.' });
+      return res
+        .status(400)
+        .json({
+          error:
+            '유효하지 않은 쿠폰입니다.',
+        });
     }
 
     const used = db
-      .prepare('SELECT id FROM coupon_usage WHERE user_id = ? AND coupon_id = ?')
-      .get(userId, coupon.id);
+      .prepare(
+        `SELECT id
+         FROM coupon_usage
+         WHERE user_id = ?
+           AND coupon_id = ?`
+      )
+      .get(
+        userId,
+        coupon.id
+      );
+
     if (used) {
-      return res.status(409).json({ error: '이미 사용한 쿠폰입니다.' });
+      return res
+        .status(409)
+        .json({
+          error:
+            '이미 사용한 쿠폰입니다.',
+        });
     }
 
-    // 최소 주문 금액 조건 (예: ONCE20은 10만원 이상 구매 시에만 적용 가능)
-    if (coupon.min_order_amount && subtotal < coupon.min_order_amount) {
-      return res.status(400).json({
-        error: `${coupon.min_order_amount.toLocaleString('ko-KR')}원 이상 구매 시 사용할 수 있는 쿠폰입니다.`,
-      });
+    if (
+      coupon.min_order_amount &&
+      subtotal <
+        coupon.min_order_amount
+    ) {
+      return res
+        .status(400)
+        .json({
+          error:
+            `${coupon.min_order_amount.toLocaleString(
+              'ko-KR'
+            )}원 이상 구매 시 사용할 수 있는 쿠폰입니다.`,
+        });
     }
 
-    couponId = coupon.id;
-    totalPrice = Math.round(totalPrice * (1 - coupon.discount_percent / 100));
+    couponId =
+      coupon.id;
+
+    totalPrice =
+      Math.round(
+        totalPrice *
+          (1 -
+            coupon.discount_percent /
+              100)
+      );
   }
 
-  const orderNumber = generateOrderNumber();
+  const orderNumber =
+    generateOrderNumber();
 
-  const runTransaction = db.transaction(() => {
-    const orderResult = db
-      .prepare(
-        `INSERT INTO orders (order_number, user_id, total_price, status, coupon_id, recipient_name, recipient_phone, address, idempotency_key)
-         VALUES (?, ?, ?, 'paid', ?, ?, ?, ?, ?)`
-      )
-      .run(orderNumber, userId, totalPrice, couponId, recipientName, recipientPhone, address, idempotencyKey);
+  /*
+   * ============================
+   * 실제 주문 생성
+   * ============================
+   */
+  const runTransaction =
+    db.transaction(() => {
+      const orderResult =
+        db
+          .prepare(
+            `INSERT INTO orders (
+              order_number,
+              user_id,
+              total_price,
+              status,
+              coupon_id,
+              recipient_name,
+              recipient_phone,
+              address,
+              idempotency_key
+            )
+            VALUES (
+              ?,
+              ?,
+              ?,
+              'paid',
+              ?,
+              ?,
+              ?,
+              ?,
+              ?
+            )`
+          )
+          .run(
+            orderNumber,
+            userId,
+            totalPrice,
+            couponId,
+            recipientName,
+            recipientPhone,
+            address,
+            idempotencyKey
+          );
 
-    const orderId = orderResult.lastInsertRowid;
+      const orderId =
+        orderResult.lastInsertRowid;
 
-    const insertOrderItem = db.prepare(
-      `INSERT INTO order_items (order_id, product_id, option_label, quantity, price_at_order) VALUES (?, ?, ?, ?, ?)`
-    );
-    const decrementStock = db.prepare('UPDATE products SET stock = stock - ? WHERE id = ?');
+      const insertOrderItem =
+        db.prepare(
+          `INSERT INTO order_items (
+            order_id,
+            product_id,
+            option_label,
+            quantity,
+            price_at_order
+          )
+          VALUES (?, ?, ?, ?, ?)`
+        );
 
-    for (const item of cartItems) {
-      insertOrderItem.run(orderId, item.product_id, item.option_label, item.quantity, item.price);
-      decrementStock.run(item.quantity, item.product_id);
-    }
+      const decrementStock =
+        db.prepare(
+          `UPDATE products
+           SET stock = stock - ?
+           WHERE id = ?`
+        );
 
-    if (couponId) {
-      db.prepare('INSERT INTO coupon_usage (user_id, coupon_id, order_id) VALUES (?, ?, ?)').run(
-        userId,
-        couponId,
-        orderId
-      );
-    }
+      for (
+        const item of orderItems
+      ) {
+        insertOrderItem.run(
+          orderId,
+          item.product_id,
+          item.option_label,
+          item.quantity,
+          item.price
+        );
 
-    db.prepare('DELETE FROM cart_items WHERE user_id = ?').run(userId);
+        decrementStock.run(
+          item.quantity,
+          item.product_id
+        );
+      }
 
-    return orderId;
-  });
+      /*
+       * 쿠폰 사용 기록
+       */
+      if (couponId) {
+        db.prepare(
+          `INSERT INTO coupon_usage (
+            user_id,
+            coupon_id,
+            order_id
+          )
+          VALUES (?, ?, ?)`
+        ).run(
+          userId,
+          couponId,
+          orderId
+        );
+      }
+
+      /*
+       * 장바구니 주문인 경우에만
+       * 장바구니 삭제
+       *
+       * 바로 구매는 기존 장바구니를
+       * 건드리지 않는다.
+       */
+      if (!isDirectOrder) {
+        db.prepare(
+          `DELETE FROM cart_items
+           WHERE user_id = ?`
+        ).run(userId);
+      }
+
+      return orderId;
+    });
 
   try {
-    const orderId = runTransaction();
-    res.status(201).json({ orderId, orderNumber, totalPrice, status: 'paid' });
+    const orderId =
+      runTransaction();
+
+    return res
+      .status(201)
+      .json({
+        orderId,
+        orderNumber,
+        totalPrice,
+        status: 'paid',
+      });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: '주문 처리 중 오류가 발생했습니다.' });
+
+    return res
+      .status(500)
+      .json({
+        error:
+          '주문 처리 중 오류가 발생했습니다.',
+      });
   }
 }
 
-// 내 주문 목록 (Orders.jsx가 상품 썸네일까지 바로 보여줄 수 있게 대표 상품 정보도 같이 반환)
 function myOrders(req, res) {
   const orders = db
-    .prepare('SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC')
+    .prepare(
+      `SELECT *
+       FROM orders
+       WHERE user_id = ?
+       ORDER BY created_at DESC`
+    )
     .all(req.user.id);
 
-  const getItemsStmt = db.prepare(
-    `SELECT oi.*, p.name, p.brand, p.image_url FROM order_items oi JOIN products p ON p.id = oi.product_id WHERE oi.order_id = ?`
-  );
+  const getItemsStmt =
+    db.prepare(
+      `SELECT
+        oi.*,
+        p.name,
+        p.brand,
+        p.image_url
+       FROM order_items oi
+       JOIN products p
+         ON p.id = oi.product_id
+       WHERE oi.order_id = ?`
+    );
 
-  const withItems = orders.map((order) => ({ ...order, items: getItemsStmt.all(order.id) }));
-  res.json(withItems);
+  const withItems =
+    orders.map((order) => ({
+      ...order,
+
+      items:
+        getItemsStmt.all(
+          order.id
+        ),
+    }));
+
+  return res.json(
+    withItems
+  );
 }
 
-// 주문 상세 (SR-08: 본인 주문만 조회 가능 - 소유자 검증)
 function orderDetail(req, res) {
-  const { id } = req.params;
+  const { id } =
+    req.params;
 
-  const order = db.prepare('SELECT * FROM orders WHERE id = ?').get(id);
-  if (!order) return res.status(404).json({ error: '주문을 찾을 수 없습니다.' });
+  const order = db
+    .prepare(
+      `SELECT *
+       FROM orders
+       WHERE id = ?`
+    )
+    .get(id);
 
-  // 본인 주문이 아니면 관리자가 아닌 이상 접근 불가
-  if (order.user_id !== req.user.id && req.user.role !== 'admin') {
-    return res.status(403).json({ error: '접근 권한이 없습니다.' });
+  if (!order) {
+    return res
+      .status(404)
+      .json({
+        error:
+          '주문을 찾을 수 없습니다.',
+      });
+  }
+
+  if (
+    order.user_id !==
+      req.user.id &&
+    req.user.role !== 'admin'
+  ) {
+    return res
+      .status(403)
+      .json({
+        error:
+          '접근 권한이 없습니다.',
+      });
   }
 
   const items = db
     .prepare(
-      `SELECT oi.*, p.name, p.brand, p.image_url FROM order_items oi JOIN products p ON p.id = oi.product_id WHERE oi.order_id = ?`
+      `SELECT
+        oi.*,
+        p.name,
+        p.brand,
+        p.image_url
+       FROM order_items oi
+       JOIN products p
+         ON p.id = oi.product_id
+       WHERE oi.order_id = ?`
     )
     .all(id);
 
-  res.json({ ...order, items });
+  return res.json({
+    ...order,
+    items,
+  });
 }
 
-module.exports = { createOrder, myOrders, orderDetail, generateOrderNumber };
+function maskName(name) {
+  if (!name) {
+    return '';
+  }
+
+  if (name.length === 1) {
+    return name;
+  }
+
+  if (name.length === 2) {
+    return `${name[0]}*`;
+  }
+
+  return `${name[0]}${'*'.repeat(
+    name.length - 2
+  )}${name[name.length - 1]}`;
+}
+
+function maskPhone(phone) {
+  if (!phone) {
+    return '';
+  }
+
+  const normalized =
+    String(phone).replace(
+      /\D/g,
+      ''
+    );
+
+  if (
+    normalized.length === 11
+  ) {
+    return `${normalized.slice(
+      0,
+      3
+    )}-****-${normalized.slice(
+      7
+    )}`;
+  }
+
+  if (
+    normalized.length === 10
+  ) {
+    return `${normalized.slice(
+      0,
+      3
+    )}-***-${normalized.slice(
+      6
+    )}`;
+  }
+
+  return '***-****-****';
+}
+
+function orderReceipt(req, res) {
+  const { id } =
+    req.params;
+
+  const order = db
+    .prepare(
+      `SELECT *
+       FROM orders
+       WHERE id = ?`
+    )
+    .get(id);
+
+  if (!order) {
+    return res
+      .status(404)
+      .json({
+        error:
+          '영수증을 찾을 수 없습니다.',
+      });
+  }
+
+  /*
+   * VULN_MODE=false:
+   * IDOR 취약 상태
+   *
+   * VULN_MODE=true:
+   * 주문 소유권 검사
+   */
+  const strictReceiptOwnership =
+    process.env.VULN_MODE ===
+    'true';
+
+  if (
+    strictReceiptOwnership &&
+    order.user_id !==
+      req.user.id &&
+    req.user.role !== 'admin'
+  ) {
+    return res
+      .status(403)
+      .json({
+        error:
+          '접근 권한이 없습니다.',
+      });
+  }
+
+  const items = db
+    .prepare(
+      `SELECT
+        oi.id,
+        oi.product_id,
+        oi.option_label,
+        oi.quantity,
+        oi.price_at_order,
+        p.name,
+        p.brand,
+        p.image_url
+       FROM order_items oi
+       JOIN products p
+         ON p.id = oi.product_id
+       WHERE oi.order_id = ?`
+    )
+    .all(id);
+
+  return res.json({
+    id:
+      order.id,
+
+    order_number:
+      order.order_number,
+
+    created_at:
+      order.created_at,
+
+    total_price:
+      order.total_price,
+
+    status:
+      order.status,
+
+    payment_method:
+      order.payment_method ||
+      '카드 결제',
+
+    recipient_name:
+      maskName(
+        order.recipient_name
+      ),
+
+    recipient_phone:
+      maskPhone(
+        order.recipient_phone
+      ),
+
+    items,
+  });
+}
+
+module.exports = {
+  createOrder,
+  myOrders,
+  orderDetail,
+  orderReceipt,
+  generateOrderNumber,
+};

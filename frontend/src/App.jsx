@@ -74,6 +74,31 @@ const AppRoutes = () => {
   ] = useState(true);
 
   /*
+   * 현재 브라우저 탭에서
+   * 최초 진입 여부 확인.
+   *
+   * 최초 / 접속 시에만 Signup을 보여주고,
+   * 이후 / 이동은 기존 MainHome으로 이동한다.
+   */
+  const [
+    showInitialSignup,
+    setShowInitialSignup,
+  ] = useState(() => {
+    if (
+      typeof window ===
+      "undefined"
+    ) {
+      return false;
+    }
+
+    return (
+      !sessionStorage.getItem(
+        "yb-bly-initial-signup"
+      )
+    );
+  });
+
+  /*
    * URL이 변경될 때마다
    * 서버에 현재 로그인 상태 확인.
    *
@@ -132,6 +157,25 @@ const AppRoutes = () => {
       cancelled = true;
     };
   }, [pathname]);
+
+  /*
+   * 최초 / 진입 시 Signup을 한 번 보여준 뒤
+   * 같은 탭에서는 다시 MainHome이 나오도록 처리.
+   */
+  useEffect(() => {
+    if (
+      pathname === "/" &&
+      showInitialSignup
+    ) {
+      sessionStorage.setItem(
+        "yb-bly-initial-signup",
+        "true"
+      );
+    }
+  }, [
+    pathname,
+    showInitialSignup,
+  ]);
 
   const isLoggedIn =
     Boolean(currentUser);
@@ -202,7 +246,9 @@ const AppRoutes = () => {
       return (
         <div className="container">
           <main className="empty-state">
-            <span>!</span>
+            <span>
+              !
+            </span>
 
             <strong>
               관리자 권한이
@@ -238,25 +284,44 @@ const AppRoutes = () => {
   /*
    * 일반 페이지
    */
+
+  /*
+   * / 주소는 그대로 메인 주소로 유지.
+   *
+   * 단, 브라우저 탭 최초 진입 시에는
+   * Signup을 한 번 먼저 보여준다.
+   */
   if (pathname === "/") {
+    if (showInitialSignup) {
+      return (
+        <Signup
+          onInitialComplete={() =>
+            setShowInitialSignup(
+              false
+            )
+          }
+        />
+      );
+    }
+
     return <MainHome />;
   }
 
-  if (pathname === "/login") {
-    /*
-     * 이미 관리자 로그인 상태에서
-     * /login에 접근하면 관리자 화면으로
-     * 보내도 되지만 커스텀 라우터 특성상
-     * 여기서는 단순 Login 렌더링 유지.
-     */
+  if (
+    pathname === "/login"
+  ) {
     return <Login />;
   }
 
-  if (pathname === "/signup") {
+  if (
+    pathname === "/signup"
+  ) {
     return <Signup />;
   }
 
-  if (pathname === "/mypage") {
+  if (
+    pathname === "/mypage"
+  ) {
     return <MyPage />;
   }
 
@@ -274,7 +339,9 @@ const AppRoutes = () => {
     return <Wishlist />;
   }
 
-  if (pathname === "/cart") {
+  if (
+    pathname === "/cart"
+  ) {
     return <Cart />;
   }
 
@@ -467,7 +534,9 @@ const AppRoutes = () => {
   return (
     <div className="container">
       <main className="empty-state">
-        <span>!</span>
+        <span>
+          !
+        </span>
 
         <strong>
           페이지를 찾을 수

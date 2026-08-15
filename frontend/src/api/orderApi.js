@@ -45,13 +45,15 @@ const normalizeOrderItem = (item) => {
       "",
 
     quantity:
-      Number(item.quantity ?? 1),
+      Number(
+        item.quantity ?? 1
+      ),
 
     price:
       Number(
         item.price_at_order ??
-          item.price ??
-          0
+        item.price ??
+        0
       ),
 
     image:
@@ -70,7 +72,8 @@ export const normalizeOrder = (order) => {
   return {
     ...order,
 
-    id: Number(order.id),
+    id:
+      Number(order.id),
 
     number:
       order.order_number ??
@@ -80,8 +83,8 @@ export const normalizeOrder = (order) => {
     total:
       Number(
         order.total_price ??
-          order.totalPrice ??
-          0
+        order.totalPrice ??
+        0
       ),
 
     statusLabel:
@@ -107,30 +110,114 @@ export const normalizeOrder = (order) => {
       order.createdAt ??
       "",
 
-    items: Array.isArray(order.items)
-      ? order.items.map(
+    items:
+      Array.isArray(order.items)
+        ? order.items.map(
           normalizeOrderItem
         )
-      : [],
+        : [],
   };
 };
 
+export const normalizeReceipt = (
+  receipt
+) => {
+  if (!receipt) {
+    return null;
+  }
+
+  return {
+    id:
+      Number(receipt.id),
+
+    number:
+      receipt.order_number ??
+      receipt.orderNumber ??
+      "",
+
+    createdAt:
+      receipt.created_at ??
+      receipt.createdAt ??
+      "",
+
+    total:
+      Number(
+        receipt.total_price ??
+        receipt.totalPrice ??
+        0
+      ),
+
+    status:
+      receipt.status ?? "",
+
+    statusLabel:
+      getOrderStatusLabel(
+        receipt.status
+      ),
+
+    paymentMethod:
+      receipt.payment_method ??
+      receipt.paymentMethod ??
+      "",
+
+    recipient:
+      receipt.recipient_name ??
+      receipt.recipientName ??
+      "",
+
+    phone:
+      receipt.recipient_phone ??
+      receipt.recipientPhone ??
+      "",
+
+    items:
+      Array.isArray(receipt.items)
+        ? receipt.items.map(
+          normalizeOrderItem
+        )
+        : [],
+  };
+};
+
+/*
+ * 주문 생성
+ *
+ * 기존 장바구니 주문뿐만 아니라
+ * 바로구매 상품도 전달할 수 있도록
+ * items, orderType 추가
+ */
 export const createOrder = async ({
   couponCode,
   idempotencyKey,
   recipientName,
   recipientPhone,
   address,
+  items,
+  orderType,
 }) => {
+  console.log("orderApi 실제 전달값:", {
+    items,
+    orderType,
+  });
+
   const response = await api.post(
     "/orders",
     {
       couponCode:
         couponCode || undefined,
+
       idempotencyKey,
       recipientName,
       recipientPhone,
       address,
+
+      items:
+        Array.isArray(items)
+          ? items
+          : undefined,
+
+      orderType:
+        orderType || undefined,
     }
   );
 
@@ -154,6 +241,18 @@ export const getOrder = async (
   );
 
   return normalizeOrder(
+    response.data
+  );
+};
+
+export const getOrderReceipt = async (
+  orderId
+) => {
+  const response = await api.get(
+    `/orders/${orderId}/receipt`
+  );
+
+  return normalizeReceipt(
     response.data
   );
 };

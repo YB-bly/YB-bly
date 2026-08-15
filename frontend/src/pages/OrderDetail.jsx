@@ -16,6 +16,7 @@ import {
 
 import {
   getOrder,
+  getOrderReceipt,
 } from "../api/orderApi";
 
 const OrderDetail = () => {
@@ -25,11 +26,24 @@ const OrderDetail = () => {
   const [order, setOrder] =
     useState(null);
 
+  const [receipt, setReceipt] =
+    useState(null);
+
   const [loading, setLoading] =
     useState(true);
 
+  const [
+    receiptLoading,
+    setReceiptLoading,
+  ] = useState(false);
+
   const [error, setError] =
     useState("");
+
+  const [
+    receiptError,
+    setReceiptError,
+  ] = useState("");
 
   useEffect(() => {
     const fetchOrder =
@@ -108,6 +122,34 @@ const OrderDetail = () => {
       )
       .replaceAll(" ", "");
   };
+
+  const handleReceipt =
+    async () => {
+      try {
+        setReceiptLoading(true);
+        setReceiptError("");
+
+        const data =
+          await getOrderReceipt(
+            order.id
+          );
+
+        setReceipt(data);
+      } catch (error) {
+        console.error(
+          "영수증 조회 실패:",
+          error
+        );
+
+        setReceiptError(
+          error.response?.data
+            ?.error ||
+            "영수증을 불러오지 못했습니다."
+        );
+      } finally {
+        setReceiptLoading(false);
+      }
+    };
 
   if (loading) {
     return (
@@ -229,7 +271,9 @@ const OrderDetail = () => {
                       {item.option ||
                         "FREE"}{" "}
                       ·{" "}
-                      {item.quantity}
+                      {
+                        item.quantity
+                      }
                       개
                     </span>
 
@@ -324,6 +368,163 @@ const OrderDetail = () => {
                 </strong>
               </dd>
             </dl>
+          </section>
+
+          <section className="order-detail__section">
+            <h2>
+              결제 영수증
+            </h2>
+
+            {!receipt && (
+              <button
+                type="button"
+                onClick={
+                  handleReceipt
+                }
+                disabled={
+                  receiptLoading
+                }
+              >
+                {receiptLoading
+                  ? "영수증 불러오는 중..."
+                  : "영수증 보기"}
+              </button>
+            )}
+
+            {receiptError && (
+              <p>
+                {receiptError}
+              </p>
+            )}
+
+            {receipt && (
+              <>
+                <dl>
+                  <dt>
+                    주문번호
+                  </dt>
+
+                  <dd>
+                    {
+                      receipt.number
+                    }
+                  </dd>
+
+                  <dt>
+                    주문일시
+                  </dt>
+
+                  <dd>
+                    {formatDate(
+                      receipt.createdAt
+                    )}
+                  </dd>
+
+                  <dt>
+                    결제방식
+                  </dt>
+
+                  <dd>
+                    {
+                      receipt.paymentMethod
+                    }
+                  </dd>
+
+                  <dt>
+                    결제금액
+                  </dt>
+
+                  <dd>
+                    <strong>
+                      {formatPrice(
+                        receipt.total
+                      )}
+                    </strong>
+                  </dd>
+
+                  <dt>
+                    수령인
+                  </dt>
+
+                  <dd>
+                    {
+                      receipt.recipient
+                    }
+                  </dd>
+
+                  <dt>
+                    연락처
+                  </dt>
+
+                  <dd>
+                    {
+                      receipt.phone
+                    }
+                  </dd>
+                </dl>
+
+                <h3>
+                  구매 상품
+                </h3>
+
+                {receipt.items.map(
+                  (item) => (
+                    <div
+                      className="order-detail__product"
+                      key={
+                        item.id
+                      }
+                    >
+                      {item.image ? (
+                        <img
+                          src={
+                            item.image
+                          }
+                          alt={
+                            item.name
+                          }
+                        />
+                      ) : (
+                        <div className="order-detail__image-placeholder">
+                          이미지 준비 중
+                        </div>
+                      )}
+
+                      <div>
+                        <strong>
+                          {
+                            item.brand
+                          }
+                        </strong>
+
+                        <p>
+                          {
+                            item.name
+                          }
+                        </p>
+
+                        <span>
+                          {item.option ||
+                            "FREE"}{" "}
+                          ·{" "}
+                          {
+                            item.quantity
+                          }
+                          개
+                        </span>
+
+                        <b>
+                          {formatPrice(
+                            item.price *
+                              item.quantity
+                          )}
+                        </b>
+                      </div>
+                    </div>
+                  )
+                )}
+              </>
+            )}
           </section>
 
           <p className="order-detail__number">
