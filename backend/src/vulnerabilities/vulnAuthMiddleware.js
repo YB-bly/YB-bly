@@ -24,6 +24,52 @@ function vulnAuthMiddleware(req, res, next) {
   }
 }
 
+// 기존 vulnRoutes에서 주문 생성 시 사용하지만 구현이 누락되어 있던 미들웨어.
+// 교육용 취약 모드의 기존 의도대로 payload만 읽고 서명은 검증하지 않는다.
+function attachUserIfPresent(req, res, next) {
+  const token = req.cookies.token;
+
+  if (!token) {
+    return res.status(401).json({ error: '로그인이 필요합니다.' });
+  }
+
+  const decoded = jwt.decode(token);
+  if (!decoded || typeof decoded !== 'object') {
+    return res.status(401).json({ error: '유효하지 않은 토큰입니다.' });
+  }
+
+  req.user = decoded;
+  req.token = token;
+  next();
+}
+
+// 관리자 대시보드 전용 JWT 인증 우회 실습 미들웨어.
+// exp와 role은 확인하지만, JWT 서명은 검증하지 않는다.
+function unsignedAdminDashboardOnly(req, res, next) {
+  const token = req.cookies.token;
+
+  if (!token) {
+    return res.status(401).json({ error: '로그인이 필요합니다.' });
+  }
+
+  const decoded = jwt.decode(token);
+  if (!decoded || typeof decoded !== 'object') {
+    return res.status(401).json({ error: '유효하지 않은 토큰입니다.' });
+  }
+
+  if (typeof decoded.exp !== 'number' || decoded.exp <= Math.floor(Date.now() / 1000)) {
+    return res.status(401).json({ error: '만료된 토큰입니다.' });
+  }
+
+  if (decoded.role !== 'admin') {
+    return res.status(403).json({ error: '관리자만 접근할 수 있습니다.' });
+  }
+
+  req.user = decoded;
+  req.token = token;
+  next();
+}
+
 //  취약 포인트 3: 관리자 페이지 중 "대시보드"는 급하게 추가되면서
 //  이 미들웨어에 role 검사가 없음 (아래 vulnAdminRoutes에서 adminOnly 없이 연결됨)
 function vulnAdminOnly(req, res, next) {
@@ -33,4 +79,9 @@ function vulnAdminOnly(req, res, next) {
   next();
 }
 
-module.exports = { vulnAuthMiddleware, vulnAdminOnly };
+module.exports = {
+  vulnAuthMiddleware,
+  attachUserIfPresent,
+  vulnAdminOnly,
+  unsignedAdminDashboardOnly,
+};
