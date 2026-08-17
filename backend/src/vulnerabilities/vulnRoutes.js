@@ -10,7 +10,11 @@ const productController = require('../controllers/productController');
 const adminController = require('../controllers/adminController');
 const { authMiddleware, adminOnly } = require('../middleware/authMiddleware');
 
-const { vulnAuthMiddleware, attachUserIfPresent, vulnAdminOnly } = require('./vulnAuthMiddleware');
+const {
+  vulnAuthMiddleware,
+  attachUserIfPresent,
+  unsignedAdminDashboardOnly,
+} = require('./vulnAuthMiddleware');
 const { vulnSearch } = require('./vulnProductController');
 const { vulnListByProduct } = require('./vulnReviewController');
 const { vulnCreateOrder, myOrders, vulnOrderDetail } = require('./vulnOrderController');
@@ -50,12 +54,12 @@ reviewRouter.post('/', authMiddleware, reviewController.create);
 reviewRouter.delete('/:id', authMiddleware, reviewController.remove);
 router.use('/reviews', reviewRouter);
 
-// ---- 관리자: 대시보드만 권한 검사 누락 ----
+// ---- 관리자: 대시보드만 JWT 서명 검증 누락 ----
 const adminRouter = express.Router();
 adminRouter.get('/orders', authMiddleware, adminOnly, adminController.listOrders);
 adminRouter.patch('/orders/:id/status', authMiddleware, adminOnly, adminController.updateOrderStatus);
 adminRouter.get('/users', authMiddleware, adminOnly, adminController.listUsers);
-adminRouter.get('/dashboard', vulnAuthMiddleware, adminController.dashboard); // 🚩 adminOnly 없음
+adminRouter.get('/dashboard', unsignedAdminDashboardOnly, adminController.dashboard); // 🚩 서명 미검증
 router.use('/admin', adminRouter);
 
 module.exports = router;
