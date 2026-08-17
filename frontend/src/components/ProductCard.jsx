@@ -13,6 +13,27 @@ const ProductCard = ({
     onLike?.();
   };
 
+  const ratingStyle = {
+    display: "flex",
+    alignItems: "center",
+    gap: "5px",
+    margin: "8px 0 0",
+    fontSize: "13px",
+    fontWeight: 700,
+    lineHeight: 1.4,
+  };
+
+  const starStyle = {
+    color: "#f5a623",
+    fontSize: "14px",
+  };
+
+  const ratingCountStyle = {
+    color: "#8a8a8a",
+    fontSize: "12px",
+    fontWeight: 500,
+  };
+
   return (
     <article className="product-card">
       <div className="product-card__image-wrap">
@@ -72,17 +93,14 @@ const ProductCard = ({
           </p>
 
           <p className="product-card__price">
-            {Number(product.discount) >
-              0 && (
+            {Number(product.discount) > 0 && (
               <span>
                 {product.discount}%
               </span>
             )}
 
             <strong>
-              {formatPrice(
-                product.price
-              )}
+              {formatPrice(product.price)}
             </strong>
           </p>
 
@@ -100,16 +118,22 @@ const ProductCard = ({
               ))}
           </div>
 
-          <p className="product-card__rating">
-            ★{" "}
-            {Number(
-              product.rating ?? 0
-            ).toFixed(1)}
+          <p style={ratingStyle}>
+            <span
+              style={starStyle}
+              aria-hidden="true"
+            >
+              ★
+            </span>
+
             <span>
-              (
-              {product.reviews ??
-                0}
-              )
+              {Number(
+                product.rating ?? 0
+              ).toFixed(1)}
+            </span>
+
+            <span style={ratingCountStyle}>
+              리뷰 {product.reviews ?? 0}
             </span>
           </p>
         </div>

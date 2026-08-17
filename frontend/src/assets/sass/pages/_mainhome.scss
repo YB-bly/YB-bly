@@ -508,6 +508,31 @@
     color: var(--gray-500);
     font-size: 14px;
   }
+
+  .recommend_more {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+
+    padding: 6px 0;
+
+    color: var(--gray-600);
+    font-size: 14px;
+    font-weight: 600;
+
+    background: none;
+    border: 0;
+    cursor: pointer;
+
+    span {
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    &:hover {
+      color: var(--black);
+    }
+  }
 }
 
 .items {
