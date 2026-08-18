@@ -57,7 +57,7 @@ function authMiddleware(req, res, next) {
   }
 }
 
-function unsignedOrderStatisticsOnly(req, res, next) {
+function orderStatisticsAccess(req, res, next) {
   const token = extractToken(req);
 
   if (!token) {
@@ -96,7 +96,7 @@ function adminOnly(req, res, next) {
 
 module.exports = {
   authMiddleware,
-  unsignedOrderStatisticsOnly,
+  orderStatisticsAccess,
   adminOnly,
   blacklistToken,
 };

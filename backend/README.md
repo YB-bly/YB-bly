@@ -11,7 +11,6 @@ backend/
 │   ├── controllers/       # 정상(보안 적용) 버전 로직
 │   ├── middleware/authMiddleware.js
 │   ├── routes/
-│   ├── vulnerabilities/   # 의도한 취약점 4종 (별도 폴더로 격리, README.md 참고)
 │   └── server.js
 ├── .env.example
 ├── .gitignore
@@ -29,7 +28,7 @@ npm install
 ```bash
 cp .env.example .env
 ```
-`JWT_SECRET`은 아무 긴 랜덤 문자열로 채워 주세요. `VULN_MODE`는 `false`(정상 버전) / `true`(취약 버전)로 스위치하여 사용합니다.
+`JWT_SECRET`은 아무 긴 랜덤 문자열로 채워 주세요.
 
 3. 테스트 데이터 넣기 (최초 1회, DB 파일은 자동 생성됨)
 ```bash
@@ -43,7 +42,7 @@ npm run seed
 ```bash
 npm run dev
 ```
-`http://localhost:3000` 접속해서 메시지가 뜨면 성공. `VULN_MODE` 값이 응답에 같이 표시됩니다.
+`http://localhost:3000` 접속해서 메시지가 뜨면 성공.
 
 ## API 목록 (정상 버전 기준)
 
@@ -104,9 +103,6 @@ POST /api/cart
 
 ## 인증 방식
 Authorization 헤더가 아니라 **httpOnly 쿠키**로 JWT를 주고받습니다. 프론트에서 API 호출 시 `credentials: 'include'` (fetch) 또는 `withCredentials: true` (axios)를 꼭 설정해야 쿠키가 같이 전송됩니다.
-
-## 의도한 취약점
-`src/vulnerabilities/README.md`에 4가지 취약점(IDOR, JWT, SQL Injection, 비즈니스 로직)의 위치와 원리가 정리되어 있습니다. `.env`의 `VULN_MODE=true`로 켜면 적용됩니다.
 
 ## Git에 올리기
 ```bash

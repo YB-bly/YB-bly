@@ -50,7 +50,6 @@ app.use('/api/admin', require('./routes/adminRoutes'));
 app.get('/', (req, res) => {
   res.json({
     message: '쇼핑몰 백엔드 서버가 정상 동작 중입니다.',
-    vulnMode: false,
   });
 });
 
