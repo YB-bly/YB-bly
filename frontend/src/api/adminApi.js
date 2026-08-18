@@ -43,6 +43,14 @@ export const getAdminDashboard =
     };
   };
 
+export const getAdminOrderStatistics = async ({ from, to } = {}) => {
+  const response = await api.get("/admin/order-statistics", {
+    params: { from, to },
+  });
+
+  return response.data;
+};
+
 export const getAdminOrders =
   async () => {
     const response = await api.get(
