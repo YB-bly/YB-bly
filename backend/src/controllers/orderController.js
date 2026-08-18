@@ -53,10 +53,6 @@ function createOrder(req, res) {
     });
   }
 
-  /*
-   * 동일한 결제 요청의
-   * 중복 주문 생성 방지
-   */
   const already = db
     .prepare(
       `SELECT id
@@ -73,17 +69,6 @@ function createOrder(req, res) {
     });
   }
 
-  /*
-   * ============================
-   * 주문 상품 결정
-   * ============================
-   *
-   * direct:
-   * 상품 상세에서 바로 구매
-   *
-   * cart:
-   * 기존 장바구니 주문
-   */
   const isDirectOrder =
     orderType === 'direct' &&
     Array.isArray(items) &&
@@ -91,9 +76,6 @@ function createOrder(req, res) {
 
   let orderItems = [];
 
-  /*
-   * 바로 구매
-   */
   if (isDirectOrder) {
     const getProductStmt =
       db.prepare(
@@ -147,11 +129,6 @@ function createOrder(req, res) {
           });
       }
 
-      /*
-       * 상품 가격과 재고는
-       * 프론트에서 받은 값을 사용하지 않고
-       * DB에서 다시 조회한다.
-       */
       const product =
         getProductStmt.get(
           productId
@@ -190,9 +167,6 @@ function createOrder(req, res) {
       });
     }
   } else {
-    /*
-     * 기존 장바구니 주문
-     */
     orderItems = db
       .prepare(
         `SELECT
@@ -221,11 +195,6 @@ function createOrder(req, res) {
     }
   }
 
-  /*
-   * ============================
-   * 재고 확인
-   * ============================
-   */
   for (
     const item of orderItems
   ) {
@@ -242,11 +211,6 @@ function createOrder(req, res) {
     }
   }
 
-  /*
-   * ============================
-   * 주문 금액 계산
-   * ============================
-   */
   const subtotal =
     orderItems.reduce(
       (sum, item) =>
@@ -259,11 +223,6 @@ function createOrder(req, res) {
   let totalPrice = subtotal;
   let couponId = null;
 
-  /*
-   * ============================
-   * 쿠폰 처리
-   * ============================
-   */
   if (couponCode) {
     const coupon = db
       .prepare(
@@ -333,11 +292,6 @@ function createOrder(req, res) {
   const orderNumber =
     generateOrderNumber();
 
-  /*
-   * ============================
-   * 실제 주문 생성
-   * ============================
-   */
   const runTransaction =
     db.transaction(() => {
       const orderResult =
@@ -416,9 +370,6 @@ function createOrder(req, res) {
         );
       }
 
-      /*
-       * 쿠폰 사용 기록
-       */
       if (couponId) {
         db.prepare(
           `INSERT INTO coupon_usage (
@@ -434,13 +385,6 @@ function createOrder(req, res) {
         );
       }
 
-      /*
-       * 장바구니 주문인 경우에만
-       * 장바구니 삭제
-       *
-       * 바로 구매는 기존 장바구니를
-       * 건드리지 않는다.
-       */
       if (!isDirectOrder) {
         db.prepare(
           `DELETE FROM cart_items
@@ -639,31 +583,6 @@ function orderReceipt(req, res) {
       .json({
         error:
           '영수증을 찾을 수 없습니다.',
-      });
-  }
-
-  /*
-   * VULN_MODE=false:
-   * IDOR 취약 상태
-   *
-   * VULN_MODE=true:
-   * 주문 소유권 검사
-   */
-  const strictReceiptOwnership =
-    process.env.VULN_MODE ===
-    'true';
-
-  if (
-    strictReceiptOwnership &&
-    order.user_id !==
-      req.user.id &&
-    req.user.role !== 'admin'
-  ) {
-    return res
-      .status(403)
-      .json({
-        error:
-          '접근 권한이 없습니다.',
       });
   }
 

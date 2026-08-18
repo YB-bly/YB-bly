@@ -1,6 +1,5 @@
 const db = require('../config/db');
 
-// 내 장바구니 조회 (상품 정보 join)
 function getCart(req, res) {
   const items = db
     .prepare(
@@ -15,7 +14,6 @@ function getCart(req, res) {
   res.json(items);
 }
 
-// 장바구니에 담기 (같은 상품+같은 옵션이 이미 있으면 수량 증가)
 function addItem(req, res) {
   const { productId, quantity, optionLabel } = req.body;
 
@@ -43,16 +41,14 @@ function addItem(req, res) {
   res.status(201).json({ message: '장바구니에 담았습니다.' });
 }
 
-// 수량 변경
 function updateItem(req, res) {
-  const { id } = req.params; // cart_items.id
+  const { id } = req.params;
   const { quantity } = req.body;
 
   if (!quantity || quantity <= 0) {
     return res.status(400).json({ error: '수량은 1 이상이어야 합니다.' });
   }
 
-  // 본인 장바구니 항목인지 확인 (IDOR 방지)
   const item = db.prepare('SELECT * FROM cart_items WHERE id = ?').get(id);
   if (!item || item.user_id !== req.user.id) {
     return res.status(404).json({ error: '장바구니 항목을 찾을 수 없습니다.' });
@@ -62,7 +58,6 @@ function updateItem(req, res) {
   res.json({ message: '수량이 변경되었습니다.' });
 }
 
-// 삭제
 function removeItem(req, res) {
   const { id } = req.params;
 
