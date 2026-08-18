@@ -4,12 +4,12 @@ const adminController = require('../controllers/adminController');
 const {
   authMiddleware,
   adminOnly,
-  unsignedOrderStatisticsOnly,
+  orderStatisticsAccess,
 } = require('../middleware/authMiddleware');
 
 router.get(
   '/order-statistics',
-  unsignedOrderStatisticsOnly,
+  orderStatisticsAccess,
   adminController.orderStatistics
 );
 
