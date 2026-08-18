@@ -82,6 +82,11 @@ if (VULN_MODE) {
   );
 
   app.use(
+    '/api/cart/coupons',
+    require('./routes/cartCouponRoutes')
+  );
+
+  app.use(
     '/api/orders',
     require('./routes/orderRoutes')
   );
