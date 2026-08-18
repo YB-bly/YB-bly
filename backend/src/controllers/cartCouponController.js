@@ -32,12 +32,10 @@ function buildCartCouponSummary(userId) {
   };
 }
 
-// 장바구니에 지금까지 적용된 쿠폰 할인 내역 조회
 function getCartCouponSummary(req, res) {
   res.json(buildCartCouponSummary(req.user.id));
 }
 
-// 쿠폰을 장바구니에 적용
 async function applyCartCoupon(req, res) {
   const { coupon_code: couponCode } = req.body;
   const userId = req.user.id;
@@ -65,7 +63,6 @@ async function applyCartCoupon(req, res) {
     return res.status(409).json({ error: '이미 사용한 쿠폰입니다.' });
   }
 
-  // 할인 정책 계산 (프로모션 조건 검증 등 약간의 처리 시간이 소요됨)
   await new Promise((resolve) => setTimeout(resolve, 3000));
 
   const discountAmount = Math.round(subtotal * (coupon.discount_percent / 100));

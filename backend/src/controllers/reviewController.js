@@ -1,6 +1,5 @@
 const db = require('../config/db');
 
-// 특정 상품의 리뷰 목록 (정상 버전: order_id는 응답에 포함하지 않음)
 function listByProduct(req, res) {
   const { productId } = req.params;
 
@@ -16,7 +15,6 @@ function listByProduct(req, res) {
   res.json(reviews);
 }
 
-// 리뷰 작성 (실제로 구매(주문)한 상품에 대해서만 작성 가능 - 구매 인증)
 function create(req, res) {
   const { productId, orderId, content, rating } = req.body;
   const userId = req.user.id;
@@ -25,7 +23,6 @@ function create(req, res) {
     return res.status(400).json({ error: '필수 값이 누락되었습니다.' });
   }
 
-  // 해당 주문이 본인 것이고, 그 주문에 이 상품이 실제로 포함되어 있는지 확인
   const purchased = db
     .prepare(
       `SELECT oi.id FROM orders o
@@ -51,7 +48,6 @@ function remove(req, res) {
   const review = db.prepare('SELECT * FROM reviews WHERE id = ?').get(id);
   if (!review) return res.status(404).json({ error: '리뷰를 찾을 수 없습니다.' });
 
-  // 본인 리뷰이거나 관리자만 삭제 가능
   if (review.user_id !== req.user.id && req.user.role !== 'admin') {
     return res.status(403).json({ error: '삭제 권한이 없습니다.' });
   }

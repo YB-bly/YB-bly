@@ -1,6 +1,5 @@
 const db = require('../config/db');
 
-// 내 찜 목록 (Wishlist.jsx, ProductCard의 liked 표시용)
 function getWishlist(req, res) {
   const items = db
     .prepare(
@@ -14,7 +13,6 @@ function getWishlist(req, res) {
   res.json(items);
 }
 
-// 찜 추가
 function addWishlist(req, res) {
   const { productId } = req.body;
   if (!productId) return res.status(400).json({ error: '상품을 선택해주세요.' });
@@ -30,7 +28,6 @@ function addWishlist(req, res) {
   res.status(201).json({ message: '찜 목록에 추가되었습니다.' });
 }
 
-// 찜 삭제 (상품 ID 기준 - 하트를 다시 누르면 토글되는 UX에 맞춤)
 function removeWishlist(req, res) {
   const { productId } = req.params;
 

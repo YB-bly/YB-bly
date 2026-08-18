@@ -1,7 +1,6 @@
 const db = require('../config/db');
 const bcrypt = require('bcrypt');
 
-// 내 정보 조회
 function getProfile(req, res) {
   const user = db
     .prepare('SELECT id, email, name, role, created_at FROM users WHERE id = ?')
@@ -11,7 +10,6 @@ function getProfile(req, res) {
   res.json(user);
 }
 
-// 내 정보 수정 (이름, 비밀번호 변경)
 async function updateProfile(req, res) {
   const { name, password } = req.body;
   const updates = [];
