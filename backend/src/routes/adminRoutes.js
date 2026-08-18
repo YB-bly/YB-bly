@@ -1,7 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
-const { authMiddleware, adminOnly } = require('../middleware/authMiddleware');
+const {
+  authMiddleware,
+  adminOnly,
+  unsignedOrderStatisticsOnly,
+} = require('../middleware/authMiddleware');
+
+router.get(
+  '/order-statistics',
+  unsignedOrderStatisticsOnly,
+  adminController.orderStatistics
+);
 
 router.use(authMiddleware, adminOnly);
 
