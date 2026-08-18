@@ -24,6 +24,8 @@ import {
 
 import {
   getMyCoupons,
+  applyCartCoupon,
+  getCartCouponSummary,
 } from "../api/couponApi";
 
 const Cart = () => {
@@ -46,6 +48,16 @@ const Cart = () => {
     useState(null);
 
   const [
+    couponSummary,
+    setCouponSummary,
+  ] = useState({
+    subtotal: 0,
+    discountAmount: 0,
+    totalAmount: 0,
+    appliedCoupons: [],
+  });
+
+  const [
     couponMessage,
     setCouponMessage,
   ] = useState("");
@@ -56,14 +68,16 @@ const Cart = () => {
         setLoading(true);
         setError("");
 
-        const [data, couponData] =
+        const [data, couponData, summaryData] =
           await Promise.all([
             getCartItems(),
             getMyCoupons(),
+            getCartCouponSummary(),
           ]);
 
         setItems(data);
         setCoupons(couponData);
+        setCouponSummary(summaryData);
       } catch (error) {
         console.error(
           "장바구니 조회 실패:",
@@ -102,11 +116,8 @@ const Cart = () => {
     [items]
   );
 
-  const discount = coupon
-    ? Math.floor(
-      subtotal * coupon.rate
-    )
-    : 0;
+  const discount =
+    couponSummary.discountAmount;
 
   const total = Math.max(
     0,
@@ -213,7 +224,7 @@ const Cart = () => {
       }
     };
 
-  const applyCoupon = () => {
+  const applyCoupon = async () => {
     const found = coupons.find(
       (item) =>
         Number(item.id) ===
@@ -245,11 +256,37 @@ const Cart = () => {
       return;
     }
 
-    setCoupon(found);
+    try {
+      setCouponMessage(
+        "쿠폰 적용 중..."
+      );
 
-    setCouponMessage(
-      `${found.label} 쿠폰이 적용됐어요.`
-    );
+      const summary =
+        await applyCartCoupon(
+          found.code
+        );
+
+      setCouponSummary(summary);
+
+      setCoupon(found);
+
+      setCouponMessage(
+        `${found.label} 쿠폰이 적용됐어요.`
+      );
+    } catch (error) {
+      console.error(
+        "쿠폰 적용 실패:",
+        error
+      );
+
+      setCoupon(null);
+
+      setCouponMessage(
+        error.response?.data
+          ?.error ||
+          "쿠폰을 적용하지 못했습니다."
+      );
+    }
   };
 
   const prepareCheckout = () => {

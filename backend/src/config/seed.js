@@ -41,7 +41,6 @@ async function seed() {
     'user'
   );
 
-  // 리뷰 작성용 기본 사용자
   const reviewUsers = [
     [
       'review1@ybbly.com',
