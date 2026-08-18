@@ -255,11 +255,6 @@ const AdminProductUpload =
             description:
               form.description.trim(),
 
-            /*
-             * 현재 백엔드에는 별도
-             * 이미지 업로드 API가 없기 때문에
-             * image_url 문자열에 저장.
-             */
             image_url:
               form.image || "",
 

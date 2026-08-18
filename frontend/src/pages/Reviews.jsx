@@ -54,11 +54,6 @@ const Reviews = () => {
             getMyProfile(),
             getOrders(),
           ]);
-
-          /*
-           * 내가 주문한 모든 상품을
-           * orderId와 함께 펼쳐줌
-           */
           const purchasedItems =
             orders.flatMap(
               (order) =>
@@ -75,10 +70,6 @@ const Reviews = () => {
                 )
             );
 
-          /*
-           * 같은 상품을 여러 번 주문했어도
-           * 리뷰 목록 조회 API는 상품당 한 번만 호출
-           */
           const productIds = [
             ...new Set(
               purchasedItems.map(
@@ -107,11 +98,6 @@ const Reviews = () => {
               )
             );
 
-          /*
-           * 현재 백엔드에는 GET /reviews/me가 없어서
-           * userName과 현재 프로필 이름을 비교하여
-           * 내 리뷰를 판별
-           */
           const myReviews =
             reviewResults.flatMap(
               ({
@@ -158,11 +144,6 @@ const Reviews = () => {
               )
             );
 
-          /*
-           * reviewController에서는
-           * order.status === "paid"인 주문만
-           * 리뷰 작성 가능
-           */
           const available =
             purchasedItems.filter(
               (item) =>
@@ -175,10 +156,6 @@ const Reviews = () => {
                 )
             );
 
-          /*
-           * 같은 상품이 여러 주문에 있을 경우
-           * 리뷰 작성 가능 목록에는 한 번만 표시
-           */
           const uniqueAvailable =
             available.filter(
               (
@@ -288,10 +265,6 @@ const Reviews = () => {
         )
       );
 
-      /*
-       * 삭제한 상품을 다시
-       * 작성 가능 목록으로 복원
-       */
       if (review.product) {
         setAvailableReviews(
           (current) => {
@@ -501,11 +474,6 @@ const Reviews = () => {
                           </div>
 
                           <div className="review-card__actions">
-                            {/*
-                              현재 백엔드에는
-                              PATCH/PUT 리뷰 수정 API가 없어서
-                              수정 버튼은 제공하지 않음.
-                            */}
 
                             <button
                               type="button"

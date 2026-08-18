@@ -1,22 +1,129 @@
-.login, .signup { width: min(100%, 520px); margin: 0 auto; padding: 58px 24px 80px; }
-.auth-header { margin-bottom: 38px; }
-.login__notice { margin: -24px 0 34px; padding: 14px 16px; border-radius: 10px; background: var(--gray-100); font-size: 14px; font-weight: 700; text-align: center; }
-.auth-header__eyebrow { display: block; margin-bottom: 13px; color: var(--main); font-size: 12px; font-weight: 900; letter-spacing: 1.8px; }
-.auth-header__title { font-size: 32px; line-height: 1.2; font-weight: 900; letter-spacing: -1.3px; }
-.auth-header__description { margin-top: 12px; color: var(--gray-500); line-height: 1.6; }
-.auth-form { display: flex; flex-direction: column; gap: 21px; }
-.auth-form__error { margin-top: -10px; color: var(--red); font-size: 13px; }
-.login__options { display: flex; align-items: center; justify-content: space-between; margin-top: -5px; }
-.auth-footer { margin-top: 30px; color: var(--gray-500); text-align: center; font-size: 14px; }
-.auth-footer a { color: var(--black); font-weight: 800; text-decoration: underline; }
-.login__forgot { margin-top: 16px; padding: 17px; border-radius: 11px; background: var(--gray-50); }
-.login__forgot > p { margin: 6px 0 12px; color: var(--gray-500); font-size: 11px; line-height: 1.5; }
-.login__forgot form { display: grid; grid-template-columns: 1fr 84px; gap: 6px; }
-.login__forgot input { min-width: 0; height: 42px; padding: 0 10px; border: 1px solid var(--gray-300); border-radius: 7px; }
-.login__forgot form button { border-radius: 7px; background: var(--black); color: var(--white); font-size: 11px; font-weight: 800; }
-.login__forgot > span { display: block; margin-top: 9px; color: var(--main-dark); font-size: 11px; }
+.login,
+.signup {
+  width: min(100%, 520px);
+  margin: 0 auto;
+  padding: 58px 24px 80px;
+}
+
+.auth-header {
+  margin-bottom: 38px;
+}
+
+.login__notice {
+  margin: -24px 0 34px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--gray-100);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.auth-header__eyebrow {
+  display: block;
+  margin-bottom: 13px;
+  color: var(--main);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 1.8px;
+}
+
+.auth-header__title {
+  font-size: 32px;
+  line-height: 1.2;
+  font-weight: 900;
+  letter-spacing: -1.3px;
+}
+
+.auth-header__description {
+  margin-top: 12px;
+  color: var(--gray-500);
+  line-height: 1.6;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 21px;
+}
+
+.auth-form__error {
+  margin-top: -10px;
+  color: var(--red);
+  font-size: 13px;
+}
+
+.login__options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: -5px;
+}
+
+.auth-footer {
+  margin-top: 30px;
+  color: var(--gray-500);
+  text-align: center;
+  font-size: 14px;
+}
+
+.auth-footer a {
+  color: var(--black);
+  font-weight: 800;
+  text-decoration: underline;
+}
+
+.login__forgot {
+  margin-top: 16px;
+  padding: 17px;
+  border-radius: 11px;
+  background: var(--gray-50);
+}
+
+.login__forgot>p {
+  margin: 6px 0 12px;
+  color: var(--gray-500);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.login__forgot form {
+  display: grid;
+  grid-template-columns: 1fr 84px;
+  gap: 6px;
+}
+
+.login__forgot input {
+  min-width: 0;
+  height: 42px;
+  padding: 0 10px;
+  border: 1px solid var(--gray-300);
+  border-radius: 7px;
+}
+
+.login__forgot form button {
+  border-radius: 7px;
+  background: var(--black);
+  color: var(--white);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.login__forgot>span {
+  display: block;
+  margin-top: 9px;
+  color: var(--main-dark);
+  font-size: 11px;
+}
 
 @media (max-width: 500px) {
-  .login, .signup { padding: 42px 20px 60px; }
-  .auth-header__title { font-size: 28px; }
+
+  .login,
+  .signup {
+    padding: 42px 20px 60px;
+  }
+
+  .auth-header__title {
+    font-size: 28px;
+  }
 }

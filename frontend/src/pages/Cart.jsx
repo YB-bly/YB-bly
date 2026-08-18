@@ -79,7 +79,7 @@ const Cart = () => {
         } else {
           setError(
             error.response?.data?.error ||
-              "장바구니를 불러오지 못했습니다."
+            "장바구니를 불러오지 못했습니다."
           );
         }
       } finally {
@@ -96,7 +96,7 @@ const Cart = () => {
         (sum, item) =>
           sum +
           Number(item.price) *
-            Number(item.quantity),
+          Number(item.quantity),
         0
       ),
     [items]
@@ -104,8 +104,8 @@ const Cart = () => {
 
   const discount = coupon
     ? Math.floor(
-        subtotal * coupon.rate
-      )
+      subtotal * coupon.rate
+    )
     : 0;
 
   const total = Math.max(
@@ -135,12 +135,12 @@ const Cart = () => {
       setItems((prev) =>
         prev.map((item) =>
           item.cartItemId ===
-          cartItemId
+            cartItemId
             ? {
-                ...item,
-                quantity:
-                  nextQuantity,
-              }
+              ...item,
+              quantity:
+                nextQuantity,
+            }
             : item
         )
       );
@@ -152,7 +152,7 @@ const Cart = () => {
 
       setError(
         error.response?.data?.error ||
-          "수량 변경에 실패했습니다."
+        "수량 변경에 실패했습니다."
       );
     }
   };
@@ -182,7 +182,7 @@ const Cart = () => {
 
       setError(
         error.response?.data?.error ||
-          "상품 삭제에 실패했습니다."
+        "상품 삭제에 실패했습니다."
       );
     }
   };
@@ -429,7 +429,7 @@ const Cart = () => {
                                 updateQuantity(
                                   item.cartItemId,
                                   item.quantity -
-                                    1
+                                  1
                                 )
                               }
                             >
@@ -452,7 +452,7 @@ const Cart = () => {
                                 updateQuantity(
                                   item.cartItemId,
                                   item.quantity +
-                                    1
+                                  1
                                 )
                               }
                             >
@@ -463,7 +463,7 @@ const Cart = () => {
                           <b>
                             {formatPrice(
                               item.price *
-                                item.quantity
+                              item.quantity
                             )}
                           </b>
                         </div>
@@ -516,8 +516,8 @@ const Cart = () => {
                           ({item.code})
                           {item.minAmount
                             ? ` · ${item.minAmount.toLocaleString(
-                                "ko-KR"
-                              )}원 이상`
+                              "ko-KR"
+                            )}원 이상`
                             : ` · ${item.expiresAt}까지`}
                         </option>
                       )

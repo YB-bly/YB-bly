@@ -145,10 +145,7 @@ const MyPage = () => {
         error
       );
     } finally {
-      /*
-       * 서버 로그아웃 성공 여부와 관계없이
-       * 로그인 화면으로 이동
-       */
+
       navigate("/login", {
         replace: true,
       });

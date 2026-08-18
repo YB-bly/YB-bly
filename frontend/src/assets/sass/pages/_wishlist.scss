@@ -1,6 +1,26 @@
-.wishlist { padding: 26px 24px 54px; }
-.wishlist__heading { display: flex; align-items: baseline; gap: 8px; margin-bottom: 24px; }
-.wishlist__heading h2 { font-size: 22px; font-weight: 900; }
-.wishlist__heading span { color: var(--gray-500); font-size: 13px; }
+.wishlist {
+    padding: 26px 24px 54px;
+}
 
-@media (max-width: 500px) { .wishlist { padding: 22px 16px 44px; } }
+.wishlist__heading {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.wishlist__heading h2 {
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.wishlist__heading span {
+    color: var(--gray-500);
+    font-size: 13px;
+}
+
+@media (max-width: 500px) {
+    .wishlist {
+        padding: 22px 16px 44px;
+    }
+}

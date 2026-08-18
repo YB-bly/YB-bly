@@ -58,7 +58,7 @@ const ProductList = () => {
     setCategory,
   ] = useState(
     requestedCategory ||
-      "전체"
+    "전체"
   );
 
   const [
@@ -84,7 +84,7 @@ const ProductList = () => {
   useEffect(() => {
     setCategory(
       requestedCategory ||
-        "전체"
+      "전체"
     );
 
     setPage(1);
@@ -99,16 +99,12 @@ const ProductList = () => {
 
           const data =
             await getProducts(
-              requestedCategory
+              requestedCategory,
+              sort
             );
 
           setProducts(data);
 
-          /*
-           * 로그인 상태라면 현재 찜 목록도 조회.
-           * 비로그인 상태의 401은 상품 목록
-           * 오류로 처리하지 않는다.
-           */
           try {
             const wishlist =
               await getWishlist();
@@ -120,7 +116,7 @@ const ProductList = () => {
               )
             );
           } catch (
-            wishlistError
+          wishlistError
           ) {
             if (
               wishlistError
@@ -144,7 +140,7 @@ const ProductList = () => {
           setError(
             error.response?.data
               ?.error ||
-              "상품을 불러오지 못했습니다."
+            "상품을 불러오지 못했습니다."
           );
         } finally {
           setLoading(false);
@@ -152,8 +148,11 @@ const ProductList = () => {
       };
 
     fetchProducts();
-  }, [requestedCategory]);
-
+  }, [
+    requestedCategory,
+    sort,
+  ]);
+  
   const handleLike = async (
     productId
   ) => {
@@ -191,9 +190,9 @@ const ProductList = () => {
             )
               ? current
               : [
-                  ...current,
-                  normalizedId,
-                ]
+                ...current,
+                normalizedId,
+              ]
         );
       }
     } catch (error) {
@@ -213,7 +212,7 @@ const ProductList = () => {
       alert(
         error.response?.data
           ?.error ||
-          "찜 처리 중 오류가 발생했습니다."
+        "찜 처리 중 오류가 발생했습니다."
       );
     }
   };
@@ -255,10 +254,6 @@ const ProductList = () => {
           );
       }
 
-      /*
-       * 현재 백엔드 products에는
-       * subcategory 필드가 없음.
-       */
       if (
         requestedSubcategory
       ) {
@@ -311,7 +306,7 @@ const ProductList = () => {
         1,
         Math.ceil(
           filteredProducts.length /
-            PAGE_SIZE
+          PAGE_SIZE
         )
       );
 
@@ -333,7 +328,7 @@ const ProductList = () => {
   const pagedProducts =
     filteredProducts.slice(
       (page - 1) *
-        PAGE_SIZE,
+      PAGE_SIZE,
       page * PAGE_SIZE
     );
 
@@ -367,12 +362,11 @@ const ProductList = () => {
               {categories.map(
                 (item) => (
                   <button
-                    className={`chip${
-                      category ===
-                      item
+                    className={`chip${category ===
+                        item
                         ? " chip--active"
                         : ""
-                    }`}
+                      }`}
                     key={item}
                     type="button"
                     onClick={() => {

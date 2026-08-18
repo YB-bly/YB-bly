@@ -86,10 +86,6 @@ const Login = ({
       const role =
         data?.user?.role;
 
-      /*
-       * /admin에서 표시된 관리자 로그인 화면에
-       * 일반 사용자 계정을 입력한 경우
-       */
       if (
         adminMode &&
         role !== "admin"
@@ -112,11 +108,6 @@ const Login = ({
         return;
       }
 
-      /*
-       * 관리자 계정이면
-       * 일반 /login에서 로그인했더라도
-       * 관리자 대시보드로 이동
-       */
       if (
         role === "admin"
       ) {
@@ -130,9 +121,6 @@ const Login = ({
         return;
       }
 
-      /*
-       * 일반 사용자
-       */
       navigate(
         redirectTo &&
           !redirectTo.startsWith(

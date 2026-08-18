@@ -29,10 +29,6 @@ const Signup = ({
     const formElement =
       event.currentTarget;
 
-    /*
-     * required, email, minLength 등
-     * HTML 기본 validation 검사
-     */
     if (
       !formElement.checkValidity()
     ) {
@@ -76,9 +72,6 @@ const Signup = ({
       return;
     }
 
-    /*
-     * 최소 8자 + 영문 + 숫자
-     */
     const passwordPattern =
       /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 
