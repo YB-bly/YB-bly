@@ -185,7 +185,7 @@ const MainHome = () => {
               )
             );
           } catch (
-            wishlistError
+          wishlistError
           ) {
             if (
               wishlistError
@@ -209,7 +209,7 @@ const MainHome = () => {
           setError(
             error.response?.data
               ?.error ||
-              "추천 상품을 불러오지 못했습니다."
+            "추천 상품을 불러오지 못했습니다."
           );
         } finally {
           setLoading(false);
@@ -273,9 +273,9 @@ const MainHome = () => {
             )
               ? current
               : [
-                  ...current,
-                  normalizedId,
-                ]
+                ...current,
+                normalizedId,
+              ]
         );
       }
     } catch (error) {
@@ -295,7 +295,7 @@ const MainHome = () => {
       alert(
         error.response?.data
           ?.error ||
-          "찜 처리 중 오류가 발생했습니다."
+        "찜 처리 중 오류가 발생했습니다."
       );
     }
   };
@@ -313,9 +313,8 @@ const MainHome = () => {
             <div
               className="slide_track"
               style={{
-                transform: `translateX(-${
-                  slideIndex * 100
-                }%)`,
+                transform: `translateX(-${slideIndex * 100
+                  }%)`,
               }}
             >
               {slides.map(
@@ -398,13 +397,12 @@ const MainHome = () => {
                     key={slide.id}
                     className={
                       index ===
-                      slideIndex
+                        slideIndex
                         ? "active"
                         : ""
                     }
-                    aria-label={`${
-                      index + 1
-                    }번째 슬라이드 보기`}
+                    aria-label={`${index + 1
+                      }번째 슬라이드 보기`}
                     onClick={() =>
                       setSlideIndex(
                         index
@@ -458,6 +456,19 @@ const MainHome = () => {
                 당신을 위한 추천
                 아이템
               </h2>
+
+              <button
+                type="button"
+                className="recommend_more"
+                onClick={() =>
+                  navigate("/products")
+                }
+              >
+                상품 전체보기
+                <span aria-hidden="true">
+                  ›
+                </span>
+              </button>
             </div>
 
             {loading ? (

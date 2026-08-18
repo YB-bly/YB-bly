@@ -139,7 +139,7 @@ const Login = ({
             "/admin"
           )
           ? redirectTo
-          : "/mypage",
+          : "/",
         {
           replace: true,
         }

@@ -159,18 +159,25 @@ const AppRoutes = () => {
   }, [pathname]);
 
   /*
-   * 최초 / 진입 시 Signup을 한 번 보여준 뒤
-   * 같은 탭에서는 다시 MainHome이 나오도록 처리.
+   * 최초 / 진입에서는 Signup을 보여준다.
+   *
+   * 사용자가 Signup 화면에서 다른 페이지로 이동하면
+   * 최초 진입 처리가 끝난 것으로 간주한다.
+   *
+   * 이후 같은 탭에서 다시 / 로 이동하면
+   * Signup이 아니라 MainHome을 보여준다.
    */
   useEffect(() => {
     if (
-      pathname === "/" &&
+      pathname !== "/" &&
       showInitialSignup
     ) {
       sessionStorage.setItem(
         "yb-bly-initial-signup",
         "true"
       );
+
+      setShowInitialSignup(false);
     }
   }, [
     pathname,

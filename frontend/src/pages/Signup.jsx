@@ -7,7 +7,9 @@ import FormField from "../components/FormField";
 
 import { register } from "../api/authApi";
 
-const Signup = () => {
+const Signup = ({
+  onInitialComplete,
+}) => {
   const navigate = useNavigate();
 
   const [agreed, setAgreed] =
@@ -108,10 +110,8 @@ const Signup = () => {
         password,
       });
 
-      /*
-       * 회원가입 성공 후
-       * 로그인 페이지로 이동
-       */
+      onInitialComplete?.();
+
       navigate("/login", {
         replace: true,
       });
@@ -123,7 +123,7 @@ const Signup = () => {
 
       setError(
         error.response?.data?.error ||
-          "회원가입 중 오류가 발생했습니다."
+        "회원가입 중 오류가 발생했습니다."
       );
     } finally {
       setLoading(false);
