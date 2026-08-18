@@ -54,8 +54,6 @@ export const normalizeProduct = (product) => {
       product.stock ?? 0
     ),
 
-    // 현재 백엔드 상품 테이블에는 sizes가 없으므로
-    // 상품 상세에서는 기본 FREE 옵션을 사용
     sizes:
       product.sizes?.length
         ? product.sizes
@@ -63,10 +61,6 @@ export const normalizeProduct = (product) => {
   };
 };
 
-
-/*
- * 화면의 정렬 이름 → DB ORDER BY 표현식
- */
 const sortMap = {
   추천순: "rating DESC",
   "낮은 가격순": "price ASC",

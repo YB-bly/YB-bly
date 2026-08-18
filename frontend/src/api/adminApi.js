@@ -136,10 +136,6 @@ export const getAdminUsers =
     );
   };
 
-/*
- * 상품 관리자 API
- */
-
 export const createAdminProduct =
   async (product) => {
     const response =
@@ -190,10 +186,6 @@ export const updateAdminProductStock =
 
     return response.data;
   };
-
-/*
- * 리뷰 관리자 API
- */
 
 const normalizeAdminReview = (review) => ({
   ...review,

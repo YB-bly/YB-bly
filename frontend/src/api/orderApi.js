@@ -179,13 +179,6 @@ export const normalizeReceipt = (
   };
 };
 
-/*
- * 주문 생성
- *
- * 기존 장바구니 주문뿐만 아니라
- * 바로구매 상품도 전달할 수 있도록
- * items, orderType 추가
- */
 export const createOrder = async ({
   couponCode,
   idempotencyKey,

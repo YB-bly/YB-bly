@@ -112,10 +112,6 @@ const ProductDetail = () => {
             data.id
           );
 
-          /*
-           * 로그인 상태라면
-           * 현재 상품의 찜 여부 확인
-           */
           try {
             const wishlist =
               await getWishlist();
@@ -166,9 +162,6 @@ const ProductDetail = () => {
     fetchProduct();
   }, [productId]);
 
-  /*
-   * 상품 리뷰 API 조회
-   */
   useEffect(() => {
     if (!productId) {
       return;
@@ -401,11 +394,6 @@ const ProductDetail = () => {
     );
   }
 
-  /*
-   * 현재 products 테이블에는
-   * size 컬럼이 없으므로
-   * FREE 기본값 사용
-   */
   const sizes =
     product.sizes?.length
       ? product.sizes

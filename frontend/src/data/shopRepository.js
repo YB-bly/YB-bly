@@ -10,11 +10,6 @@ const PRODUCT_KEY =
 const REVIEW_KEY =
   "yb-bly-managed-reviews";
 
-/*
- * 쿠폰 구조를 변경했으므로
- * 기존 localStorage 데이터와 충돌하지 않도록
- * v2 키 사용
- */
 const COUPON_KEY =
   "yb-bly-coupons-v2";
 
@@ -33,12 +28,6 @@ const USER_KEY =
 const SECURITY_SETTING_KEY =
   "yb-bly-admin-security-settings";
 
-/*
- * 기본 쿠폰
- *
- * 쿠폰을 한 번 적용하면
- * localStorage 목록에서 완전히 삭제된다.
- */
 const initialCoupons = [
   {
     id: 1,
@@ -145,10 +134,6 @@ const write = (
   return value;
 };
 
-/*
- * 상품
- */
-
 export const getManagedProducts =
   () =>
     read(
@@ -237,10 +222,6 @@ export const deleteManagedProduct =
       )
     );
 
-/*
- * 리뷰
- */
-
 export const getManagedReviews =
   () =>
     read(
@@ -294,16 +275,6 @@ export const getProductReviews =
           "숨김"
     );
 
-/*
- * 쿠폰
- */
-
-/*
- * 현재 남아있는 쿠폰만 반환.
- *
- * 사용된 쿠폰은 markCouponUsed에서
- * 배열에서 삭제되므로 다시 나오지 않는다.
- */
 export const getCoupons =
   () =>
     read(
@@ -311,13 +282,6 @@ export const getCoupons =
       initialCoupons
     );
 
-/*
- * 이름은 기존 코드와 호환하기 위해
- * markCouponUsed 그대로 유지.
- *
- * 실제 동작은 status를 used로 바꾸는 게 아니라
- * 쿠폰 자체를 목록에서 삭제한다.
- */
 export const markCouponUsed =
   (couponId) =>
     write(
@@ -333,10 +297,6 @@ export const markCouponUsed =
           )
       )
     );
-
-/*
- * 카테고리
- */
 
 export const getManagedCategories =
   () =>
@@ -407,10 +367,6 @@ export const deleteManagedCategory =
           name
       )
     );
-
-/*
- * 사용자 리뷰
- */
 
 const initialUserReviews = [
   {
@@ -634,10 +590,6 @@ export const toggleUserReviewHelpful =
       )
     );
 
-/*
- * 최근 본 상품
- */
-
 export const addRecentProduct =
   (productId) =>
     write(
@@ -672,10 +624,6 @@ export const getRecentProducts =
       )
       .filter(Boolean);
 
-/*
- * 관리자 회원
- */
-
 export const getAdminUsers =
   (fallback) =>
     read(
@@ -706,10 +654,6 @@ export const updateAdminUser =
             : user
       )
     );
-
-/*
- * 관리자 보안 설정
- */
 
 export const getAdminSecuritySettings =
   () =>

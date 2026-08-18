@@ -73,13 +73,6 @@ const AppRoutes = () => {
     setAuthLoading,
   ] = useState(true);
 
-  /*
-   * 현재 브라우저 탭에서
-   * 최초 진입 여부 확인.
-   *
-   * 최초 / 접속 시에만 Signup을 보여주고,
-   * 이후 / 이동은 기존 MainHome으로 이동한다.
-   */
   const [
     showInitialSignup,
     setShowInitialSignup,
@@ -98,13 +91,6 @@ const AppRoutes = () => {
     );
   });
 
-  /*
-   * URL이 변경될 때마다
-   * 서버에 현재 로그인 상태 확인.
-   *
-   * httpOnly 쿠키이므로
-   * 프론트에서 토큰을 직접 읽지 않는다.
-   */
   useEffect(() => {
     let cancelled = false;
 
@@ -128,11 +114,6 @@ const AppRoutes = () => {
             );
           }
 
-          /*
-           * 로그아웃 상태의 401은
-           * 정상적인 상황이므로
-           * 콘솔 오류로 출력하지 않는다.
-           */
           if (
             error.response?.status !==
             401
@@ -158,15 +139,6 @@ const AppRoutes = () => {
     };
   }, [pathname]);
 
-  /*
-   * 최초 / 진입에서는 Signup을 보여준다.
-   *
-   * 사용자가 Signup 화면에서 다른 페이지로 이동하면
-   * 최초 진입 처리가 끝난 것으로 간주한다.
-   *
-   * 이후 같은 탭에서 다시 / 로 이동하면
-   * Signup이 아니라 MainHome을 보여준다.
-   */
   useEffect(() => {
     if (
       pathname !== "/" &&
@@ -214,13 +186,6 @@ const AppRoutes = () => {
       "/reviews"
     );
 
-  /*
-   * 인증 확인 중에는
-   * 로그인 페이지를 먼저 띄우지 않는다.
-   *
-   * 안 그러면 새로고침 시 로그인 화면이
-   * 순간적으로 보일 수 있음.
-   */
   if (authLoading) {
     return (
       <div className="container">
@@ -234,9 +199,6 @@ const AppRoutes = () => {
     );
   }
 
-  /*
-   * 관리자 페이지
-   */
   if (isAdminRoute) {
     if (!isLoggedIn) {
       return (
@@ -272,9 +234,6 @@ const AppRoutes = () => {
     }
   }
 
-  /*
-   * 일반 로그인 필요 페이지
-   */
   if (
     isProtectedUserRoute &&
     !isLoggedIn
@@ -288,16 +247,6 @@ const AppRoutes = () => {
     );
   }
 
-  /*
-   * 일반 페이지
-   */
-
-  /*
-   * / 주소는 그대로 메인 주소로 유지.
-   *
-   * 단, 브라우저 탭 최초 진입 시에는
-   * Signup을 한 번 먼저 보여준다.
-   */
   if (pathname === "/") {
     if (showInitialSignup) {
       return (
@@ -445,9 +394,6 @@ const AppRoutes = () => {
     return <ReviewWrite />;
   }
 
-  /*
-   * 관리자
-   */
   if (
     pathname === "/admin"
   ) {

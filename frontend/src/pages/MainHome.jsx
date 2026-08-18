@@ -168,12 +168,6 @@ const MainHome = () => {
           setProducts(
             productData.slice(0, 6)
           );
-
-          /*
-           * 찜 API는 로그인 사용자만 사용 가능.
-           * 비로그인 401은 상품 조회 실패로
-           * 처리하지 않는다.
-           */
           try {
             const wishlistData =
               await getWishlist();
