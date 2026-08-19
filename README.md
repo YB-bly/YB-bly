@@ -533,9 +533,8 @@ http://localhost:5173
 
 ### frontend
 - frontend는 두 파일을 만들어 실행해주시면 됩니다.
-- burp suite를 켜기 위한 프론트엔드 서버 켜는 명령어는 npm run dev -- --mode burp --host 0.0.0.0 입니다.
-- 해당 서버주소: http://127.0.0.1:5173
-  1. .env
+
+    1. .env
      ```bash
      VITE_API_BASE_URL=http://localhost:3000/api
      ```
@@ -543,4 +542,8 @@ http://localhost:5173
      ```bash
      VITE_API_BASE_URL=http://127.0.0.1:3000/api
      ```
+     
+- burp suite를 켜기 위한 프론트엔드 서버 켜는 명령어는 npm run dev -- --mode burp --host 0.0.0.0 입니다.
+- 해당 서버주소: http://127.0.0.1:5173
+
      
