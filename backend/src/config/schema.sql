@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
   name TEXT NOT NULL,
   role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'admin')),
   failed_login_count INTEGER NOT NULL DEFAULT 0,
+  locked_until DATETIME,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 

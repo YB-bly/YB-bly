@@ -168,6 +168,21 @@ const AdminProductUpload =
       );
     };
 
+    const ALLOWED_IMAGE_MIME_TYPES = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/gif",
+    ];
+
+    const ALLOWED_IMAGE_EXTENSIONS = [
+      ".jpg",
+      ".jpeg",
+      ".png",
+      ".webp",
+      ".gif",
+    ];
+
     const selectImage = (
       event
     ) => {
@@ -176,6 +191,34 @@ const AdminProductUpload =
 
       if (!file) return;
 
+      const fileName =
+        file.name?.toLowerCase() ||
+        "";
+
+      const hasAllowedExtension =
+        ALLOWED_IMAGE_EXTENSIONS.some(
+          (extension) =>
+            fileName.endsWith(
+              extension
+            )
+        );
+
+      if (
+        !ALLOWED_IMAGE_MIME_TYPES.includes(
+          file.type
+        ) ||
+        !hasAllowedExtension
+      ) {
+        setError(
+          "jpg, png, webp, gif 형식의 이미지 파일만 업로드할 수 있어요."
+        );
+
+        event.target.value =
+          "";
+
+        return;
+      }
+
       if (
         file.size >
         1_500_000
@@ -183,6 +226,10 @@ const AdminProductUpload =
         setError(
           "이미지는 1.5MB 이하만 사용할 수 있어요."
         );
+
+        event.target.value =
+          "";
+
         return;
       }
 
@@ -593,7 +640,7 @@ const AdminProductUpload =
 
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
                     onChange={
                       selectImage
                     }

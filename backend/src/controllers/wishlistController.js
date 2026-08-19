@@ -1,9 +1,22 @@
 const db = require('../config/db');
 
+const RATING_SUBQUERY = `
+  COALESCE(
+    (SELECT ROUND(AVG(rating), 1)
+     FROM reviews
+     WHERE product_id = p.id),
+    0
+  ) AS rating,
+
+  (SELECT COUNT(*)
+   FROM reviews
+   WHERE product_id = p.id) AS reviewCount
+`;
+
 function getWishlist(req, res) {
   const items = db
     .prepare(
-      `SELECT w.id AS wishlistId, p.*
+      `SELECT w.id AS wishlistId, p.*, ${RATING_SUBQUERY}
        FROM wishlists w JOIN products p ON p.id = w.product_id
        WHERE w.user_id = ?
        ORDER BY w.id DESC`

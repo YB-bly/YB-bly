@@ -10,6 +10,13 @@ export const login = async (email, password) => {
     localStorage.setItem("access_token", response.data.access_token);
   }
 
+  if (response.data?.user?.id) {
+    localStorage.setItem(
+      "yb-bly-current-user-id",
+      String(response.data.user.id)
+    );
+  }
+
   return response.data;
 };
 
@@ -29,5 +36,6 @@ export const logout = async () => {
     return response.data;
   } finally {
     localStorage.removeItem("access_token");
+    localStorage.removeItem("yb-bly-current-user-id");
   }
 };

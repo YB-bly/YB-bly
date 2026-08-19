@@ -19,8 +19,22 @@ const CATEGORY_KEY =
 const USER_REVIEW_KEY =
   "yb-bly-user-reviews";
 
-const RECENT_KEY =
+const RECENT_KEY_PREFIX =
   "yb-bly-recent-products";
+
+const getRecentKey = () => {
+  if (typeof window === "undefined") {
+    return `${RECENT_KEY_PREFIX}-guest`;
+  }
+
+  const userId = localStorage.getItem(
+    "yb-bly-current-user-id"
+  );
+
+  return userId
+    ? `${RECENT_KEY_PREFIX}-${userId}`
+    : `${RECENT_KEY_PREFIX}-guest`;
+};
 
 const USER_KEY =
   "yb-bly-managed-users";
@@ -593,7 +607,7 @@ export const toggleUserReviewHelpful =
 export const addRecentProduct =
   (productId) =>
     write(
-      RECENT_KEY,
+      getRecentKey(),
 
       [
         Number(
@@ -601,7 +615,7 @@ export const addRecentProduct =
         ),
 
         ...read(
-          RECENT_KEY,
+          getRecentKey(),
           []
         ).filter(
           (id) =>
@@ -616,13 +630,20 @@ export const addRecentProduct =
 export const getRecentProducts =
   () =>
     read(
-      RECENT_KEY,
+      getRecentKey(),
       []
     )
       .map(
         getManagedProduct
       )
       .filter(Boolean);
+
+export const getRecentProductIds =
+  () =>
+    read(
+      getRecentKey(),
+      []
+    ).map(Number);
 
 export const getAdminUsers =
   (fallback) =>

@@ -1,16 +1,17 @@
-// npm run seed로 실행.
-
 const bcrypt = require('bcrypt');
 const db = require('./db');
 
-async function seed() {
-  const adminPassword = await bcrypt.hash(
-    'admin1234',
-    10
-  );
+const SEED_ADMIN_EMAIL = 'admin@ybbly.com';
 
+const SEED_ADMIN_PASSWORD_HASH =
+  '$2b$10$dzcYNTIpJz0Ba709Q6Y5YuQH3vm3aBjsNTn8Cgvep.3cd9nCr.yY.';
+
+const SEED_USER_EMAIL = 'user@ybbly.com';
+const SEED_USER_PASSWORD = 'user1234';
+
+async function seed() {
   const userPassword = await bcrypt.hash(
-    'user1234',
+    SEED_USER_PASSWORD,
     10
   );
 
@@ -23,8 +24,8 @@ async function seed() {
      (email, password, name, role)
      VALUES (?, ?, ?, ?)`
   ).run(
-    'admin@ybbly.com',
-    adminPassword,
+    SEED_ADMIN_EMAIL,
+    SEED_ADMIN_PASSWORD_HASH,
     '관리자',
     'admin'
   );
@@ -34,7 +35,7 @@ async function seed() {
      (email, password, name, role)
      VALUES (?, ?, ?, ?)`
   ).run(
-    'user@ybbly.com',
+    SEED_USER_EMAIL,
     userPassword,
     '테스트유저',
     'user'
@@ -119,7 +120,7 @@ async function seed() {
      FROM users
      WHERE email = ?`
     )
-    .get('user@ybbly.com');
+    .get(SEED_USER_EMAIL);
 
   if (testUser) {
     const oldTestReviews = db
@@ -510,11 +511,7 @@ async function seed() {
   );
 
   console.log(
-    '관리자 계정: admin@ybbly.com / admin1234'
-  );
-
-  console.log(
-    '일반 계정: user@ybbly.com / user1234'
+    `일반 계정: ${SEED_USER_EMAIL} / ${SEED_USER_PASSWORD}`
   );
 
   console.log(
