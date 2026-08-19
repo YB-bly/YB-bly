@@ -529,7 +529,11 @@ http://localhost:5173
 # 14. .env 파일 설정
 
 ### backend
-- backend 는 .env.example 파일이 있습니다.
+- backend 는 .env.example 파일이 있습니다. 복사해서 .env로 만들고 값을 채우세요.
+  
+  ```bash
+  cp .env.example .env
+  ```
 
 ### frontend
 - frontend는 두 파일을 만들어 실행해주시면 됩니다.
