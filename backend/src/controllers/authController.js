@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
-const { blacklistToken } = require('../middleware/authMiddleware');
+const { blacklistToken, issueCsrfToken, clearCsrfToken } = require('../middleware/authMiddleware');
 require('dotenv').config();
 
 const SALT_ROUNDS = 10;
@@ -120,6 +120,7 @@ async function login(req, res) {
     ).run(user.id);
 
     const accessToken = issueToken(res, user);
+    issueCsrfToken(res);
 
     return res.json({
       access_token: accessToken,
@@ -142,6 +143,7 @@ function logout(req, res) {
     blacklistToken(req.token);
   }
   res.clearCookie('token');
+  clearCsrfToken(res);
   return res.json({ message: '로그아웃되었습니다.' });
 }
 

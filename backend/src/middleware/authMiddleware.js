@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 require('dotenv').config();
 
 const JWT_ISSUER = 'shopping-auth';
@@ -94,9 +95,54 @@ function adminOnly(req, res, next) {
   return next();
 }
 
+const CSRF_COOKIE_NAME = 'csrf_token';
+const CSRF_HEADER_NAME = 'x-csrf-token';
+
+function issueCsrfToken(res) {
+  const csrfToken = crypto.randomBytes(32).toString('hex');
+
+  res.cookie(CSRF_COOKIE_NAME, csrfToken, {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 30 * 60 * 1000,
+  });
+
+  return csrfToken;
+}
+
+function clearCsrfToken(res) {
+  res.clearCookie(CSRF_COOKIE_NAME);
+}
+
+const CSRF_EXEMPT_PATHS = [
+  '/api/auth/register',
+  '/api/auth/login',
+  '/api/auth/csrf-token',
+];
+
+function csrfProtection(req, res, next) {
+  const safeMethod = ['GET', 'HEAD', 'OPTIONS'].includes(req.method);
+  if (safeMethod || CSRF_EXEMPT_PATHS.includes(req.path)) {
+    return next();
+  }
+
+  const cookieToken = req.cookies?.[CSRF_COOKIE_NAME];
+  const headerToken = req.get(CSRF_HEADER_NAME);
+
+  if (!cookieToken || !headerToken || cookieToken !== headerToken) {
+    return res.status(403).json({ error: 'CSRF 토큰이 유효하지 않습니다.' });
+  }
+
+  return next();
+}
+
 module.exports = {
   authMiddleware,
   orderStatisticsAccess,
   adminOnly,
   blacklistToken,
+  issueCsrfToken,
+  clearCsrfToken,
+  csrfProtection,
 };
