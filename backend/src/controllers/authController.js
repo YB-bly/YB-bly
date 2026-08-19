@@ -1,11 +1,12 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
-const { blacklistToken } = require('../middleware/authMiddleware');
+const { blacklistToken, issueCsrfToken, clearCsrfToken } = require('../middleware/authMiddleware');
 require('dotenv').config();
 
 const SALT_ROUNDS = 10;
 const MAX_FAILED_LOGIN = 5;
+const LOCKOUT_DURATION_MS = 60 * 60 * 1000;
 
 function issueToken(res, user) {
   if (!process.env.JWT_SECRET) {
@@ -74,23 +75,52 @@ async function login(req, res) {
       return res.status(401).json(invalidMsg);
     }
 
-    if (user.failed_login_count >= MAX_FAILED_LOGIN) {
+    const now = Date.now();
+    const lockedUntil = user.locked_until
+      ? new Date(user.locked_until).getTime()
+      : null;
+
+    if (lockedUntil && lockedUntil > now) {
+      const remainingMinutes = Math.ceil((lockedUntil - now) / 60000);
       return res.status(429).json({
-        error: '로그인 시도 횟수를 초과했습니다. 잠시 후 다시 시도해주세요.',
+        error: `로그인 시도 횟수를 초과했습니다. ${remainingMinutes}분 후 다시 시도해주세요.`,
       });
+    }
+
+    if (lockedUntil && lockedUntil <= now) {
+      db.prepare(
+        'UPDATE users SET failed_login_count = 0, locked_until = NULL WHERE id = ?'
+      ).run(user.id);
+      user.failed_login_count = 0;
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+      const nextCount = user.failed_login_count + 1;
+
+      if (nextCount >= MAX_FAILED_LOGIN) {
+        const unlockAt = new Date(now + LOCKOUT_DURATION_MS).toISOString();
+        db.prepare(
+          'UPDATE users SET failed_login_count = ?, locked_until = ? WHERE id = ?'
+        ).run(nextCount, unlockAt, user.id);
+
+        return res.status(429).json({
+          error: '로그인 시도 횟수를 초과했습니다. 1시간 후 다시 시도해주세요.',
+        });
+      }
+
       db.prepare(
-        'UPDATE users SET failed_login_count = failed_login_count + 1 WHERE id = ?'
-      ).run(user.id);
+        'UPDATE users SET failed_login_count = ? WHERE id = ?'
+      ).run(nextCount, user.id);
       return res.status(401).json(invalidMsg);
     }
 
-    db.prepare('UPDATE users SET failed_login_count = 0 WHERE id = ?').run(user.id);
+    db.prepare(
+      'UPDATE users SET failed_login_count = 0, locked_until = NULL WHERE id = ?'
+    ).run(user.id);
 
     const accessToken = issueToken(res, user);
+    issueCsrfToken(res);
 
     return res.json({
       access_token: accessToken,
@@ -113,6 +143,7 @@ function logout(req, res) {
     blacklistToken(req.token);
   }
   res.clearCookie('token');
+  clearCsrfToken(res);
   return res.json({ message: '로그아웃되었습니다.' });
 }
 

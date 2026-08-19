@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const { csrfProtection } = require('./middleware/authMiddleware');
 
 require('dotenv').config();
 require('./config/db');
@@ -27,14 +28,15 @@ app.use(
   })
 );
 
-app.use(express.json({ limit: '2mb' }));
+app.use(express.json({ limit: '3mb' }));
 app.use(
   express.urlencoded({
     extended: true,
-    limit: '2mb',
+    limit: '3mb',
   })
 );
 app.use(cookieParser());
+app.use(csrfProtection);
 
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));

@@ -8,11 +8,25 @@ const api = axios.create({
   },
 });
 
+function getCookieValue(name) {
+  const match = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith(`${name}=`));
+
+  return match ? decodeURIComponent(match.split("=")[1]) : null;
+}
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("access_token");
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  const csrfToken = getCookieValue("csrf_token");
+
+  if (csrfToken) {
+    config.headers["X-CSRF-Token"] = csrfToken;
   }
 
   return config;
