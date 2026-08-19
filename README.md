@@ -525,3 +525,22 @@ http://localhost:5173
 ```
 
 ---
+
+# 14. .env 파일 설정
+
+### backend
+- backend 는 .env.example 파일이 있습니다.
+
+### frontend
+- frontend는 두 파일을 만들어 실행해주시면 됩니다.
+- burp suite를 켜기 위한 프론트엔드 서버 켜는 명령어는 npm run dev -- --mode burp --host 0.0.0.0 입니다.
+- 해당 서버주소: http://127.0.0.1:5173
+  1. .env
+     ```bash
+     VITE_API_BASE_URL=http://localhost:3000/api
+     ```
+  2. .env.burp
+     ```bash
+     VITE_API_BASE_URL=http://127.0.0.1:3000/api
+     ```
+     
